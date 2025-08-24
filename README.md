@@ -21,6 +21,7 @@ Run motor and encoder nodes
 ros2 launch lucia_controller bringup.launch.py 
 ```
 **Run joystick controller node**
+DUALSHOCK4`PS`ボタンを押し、NUC38とBluetooth接続を確立する
 ```shell
 sudo chmod 777 /dev/ttyUSB1
 ros2 launch joy_to_cmdvel teleop_twist_joy.launch.py
