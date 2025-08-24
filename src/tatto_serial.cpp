@@ -52,7 +52,7 @@ private:
     void init_serial()
     {
         struct termios tty;
-        serial_port_ = open("/dev/ttyUSB0", O_RDWR);
+        serial_port_ = open("/dev/ttyUSB1", O_RDWR);
 
         if (serial_port_ < 0) {
             RCLCPP_ERROR(this->get_logger(), "Failed to open serial port: %s", strerror(errno));
