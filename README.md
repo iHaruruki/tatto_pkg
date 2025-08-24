@@ -23,18 +23,23 @@ ros2 launch lucia_controller bringup.launch.py
 **Run joystick controller node**
 DUALSHOCK4`PS`ボタンを押し、NUC38とBluetooth接続を確立する
 ```shell
-sudo chmod 777 /dev/ttyUSB1
 ros2 launch joy_to_cmdvel teleop_twist_joy.launch.py
 ```
 **Run Spina node**
 ```shell
 sudo chmod 777 /dev/ttyUSB0
+ros2 launch spina_arm_controll joy_spina.launch.py
 ```
 うまくいかない場合
 
 **Run Tatto node**
 ```shell
+sudo chmod 777 /dev/ttyUSB1
 ros2 run tatto_pkg tatto_serial_node
+```
+**Tatto のフォトリフレクタｎ値を見る**
+```shell
+ros2 topic echo /sensor_values_raw
 ```
 **ros2 bag (センサの値のログを残す)**
 ```shell
