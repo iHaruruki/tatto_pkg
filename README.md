@@ -22,7 +22,8 @@ ros2 launch lucia_controller bringup.launch.py
 ```
 **Run joystick controller node**
 ```shell
-
+sudo chmod 777 /dev/ttyUSB1
+ros2 launch joy_to_cmdvel teleop_twist_joy.launch.py
 ```
 **Run Spina node**
 ```shell
