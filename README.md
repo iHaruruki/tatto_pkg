@@ -77,12 +77,12 @@ ros2 run tatto_pkg tatto_display_node
 
 ## :ghost: ROS 2 のプログラムを書いてみる！ 
 ### Node & Topic / NodeとTopicとは？
-- What is Node? / Nodeとは？
+- What is Node? / Nodeとは？  
 Role: The smallest unit of a ROS 2 application (an object within a process). Each node handles a single responsibility such as sensor reading, inference, or control.  
 役割：ROS 2 アプリの最小単位（プロセス内のオブジェクト）．センサ読み取り，推論，制御などの単機能を担当．  
 Official documentation: [Understanding nodes](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html)
 
-- What is Topic? / Topicとは？
+- What is Topic? / Topicとは？  
 Role: A communication channel for stream-type messages between nodes in a loosely coupled fashion.  
 役割：ノード間で非同期で情報のやりとりを行うメッセージ  
 Official documentation: [Understanding topics](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
@@ -184,13 +184,13 @@ install(TARGETS
 ament_package()
 ```
 
-- Buildする
+- Buildする  
 ```bash
 cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
 source install/setup.bash
 ```
-- 実行する
+- 実行する  
 ```bash
 ros2 run tatto_pkg topic_sub_node
 ```
