@@ -3,6 +3,7 @@
 This is Tatto repository.
 
 ## 🧩 Nodes & Topics
+![rosgraph](media/rosgraph.png)
 
 ## 🛠️ Setup
 Get `tatto_pkg` package.
