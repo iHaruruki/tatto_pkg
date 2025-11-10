@@ -35,7 +35,7 @@ topic echo / センサの値を見る
 ```bash
 ros2 topic echo /sensor_values
 ```
-<img src="media/IMG_3870.jpg" alt="sensor placement" style="width:50%;height:auto;">
+<img src="media/IMG_3870.jpg" alt="sensor placement" style="width:30%;height:auto;">
 
 ### Record sensor values / 録画する
 ros2 bag record / センサの値を録画する
