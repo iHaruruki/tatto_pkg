@@ -1,4 +1,7 @@
 # tatto_pkg
+[![ROS 2 Distro - Humble](https://img.shields.io/badge/ros2-Humble-blue)](https://docs.ros.org/en/humble/)
+[![ROS2 Distro - Jazzy](https://img.shields.io/badge/ros2-Jazzy-blue)](https://docs.ros.org/en/jazzy/)
+
 ## 🚀 Overview
 This is Tatto repository.
 
@@ -87,3 +90,5 @@ Official documentation: [Understanding topics](https://docs.ros.org/en/jazzy/Tut
 ### tattoのプログラムを書いてみる
 
 ## 📚 Reference
+ROS 2 Official documentation
+- [ROS 2-jazzy](https://docs.ros.org/en/jazzy/index.html)
