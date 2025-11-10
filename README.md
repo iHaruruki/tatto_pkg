@@ -1,5 +1,10 @@
 # tatto_pkg
-## Setup
+## 🚀 Overview
+This is Tatto repository.
+
+## 🧩 Nodes & Topics
+
+## 🛠️ Setup
 Get `tatto_pkg` package.
 ```bash
 cd ~/ros2_ws/src
@@ -10,7 +15,7 @@ Build
 cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
 ```
-## How to use
+## 🎮 How to use
 Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
