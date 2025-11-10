@@ -82,14 +82,14 @@ Role: The smallest unit of a ROS 2 application (an object within a process). Eac
 役割：ROS 2 アプリの最小単位（プロセス内のオブジェクト）．センサ読み取り，推論，制御などの単機能を担当．  
 Official documentation: [Understanding nodes](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html)
 
--What is Topic? / Topicとは？
+- What is Topic? / Topicとは？
 Role: A communication channel for stream-type messages between nodes in a loosely coupled fashion.  
 役割：ノード間で非同期で情報のやりとりを行うメッセージ  
 Official documentation: [Understanding topics](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
 
 ### tattoのプログラムを書いてみる
 #### `/sensor_values` topicを受信して，topicの値を表示するプログラムを作成する
-ソースコードは`src`ディレクトリ内に置く  
+- ソースコードは`src`ディレクトリ内に置く  
 `subscribe_topic.cpp`
 ```cpp
 #include <rclcpp/rclcpp.hpp>
@@ -133,7 +133,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 ```
-ビルドのためにCMakeLists.txtファイルを編集する
+- ビルドのためにCMakeLists.txtファイルを編集する  
 `CMakeLists.txt`
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -182,6 +182,17 @@ install(TARGETS
 )
 
 ament_package()
+```
+
+- Buildする
+```bash
+cd ~/ros2_ws
+colcon build --packages-select tatto_pkg
+source install/setup.bash
+```
+- 実行する
+```bash
+ros2 run tatto_pkg topic_sub_node
 ```
 
 ## 📚 Reference
