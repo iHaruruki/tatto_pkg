@@ -38,22 +38,22 @@ ros2 topic echo /sensor_values
 Sensor placement / センサの配置位置  
 <img src="media/IMG_3870.jpg" alt="sensor placement" style="width:30%;height:auto;">
 
-### Record sensor values / 録画する
-ros2 bag record / センサの値を録画する
+### Record sensor values / センサデータを記録する
+ros2 bag record / センサの値を記録する
 ```bash
 ros2 bag record -a
 ```
-ros2 bag play / 録画したものを再生する
+ros2 bag play / 記録したものを再生する
 ```bash
 cd ~/ros2_ws/rosbag
 # ros2 bag play <file name　ここにディレクトリのパスを書く>
 ros2 bag play $HOME/ros2_ws/rosbag/rosbag2_2025_11_10-17_46_24/
 ```
-topic echo / 録画したセンサの値を見る
+topic echo / 記録したセンサの値を見る
 ```bash
 ros2 topic echo /sensor_values
 ```
-Run display / 録画した値をディスプレイに表示
+Run display / 記録した値をディスプレイに表示
 ```bash
 ros2 run tatto_pkg tatto_display_node
 ```
