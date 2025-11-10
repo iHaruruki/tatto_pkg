@@ -17,7 +17,7 @@ cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
 ```
 ## 🎮 How to use
-### Launch tatto / 起動する
+### Launch Tatto / 起動する
 Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
@@ -44,7 +44,7 @@ ros2 bag play / 録画したものを再生する
 ```bash
 cd ~/ros2_ws/rosbag
 # ros2 bag play <file name　ここにディレクトリのパスを書く>
-ros2 bag play 
+ros2 bag play $HOME/ros2_ws/rosbag/rosbag2_2025_11_10-17_46_24/
 ```
 topic echo / 録画したセンサの値を見る
 ```bash
