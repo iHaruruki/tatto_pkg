@@ -12,7 +12,7 @@ flowchart LR
     D([/sensor_display_node])
 
     %% Topics
-    V["/sensor_values"]
+    V["/sensor_values<br/>(std_msgs::msg::UInt16MultiArray)"]
 
     S --> V
     V --> D
