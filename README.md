@@ -3,7 +3,20 @@
 This is Tatto repository.
 
 ## 🧩 Nodes & Topics
-![rosgraph](media/rosgraph.png)
+<!-- ![rosgraph](media/rosgraph.png) -->
+
+```mermaid
+flowchart LR
+    %% Nodes
+    S([/sensor_reader_node])
+    D([/sensor_display_node])
+
+    %% Topics
+    V["/sensor_values"]
+
+    S --> V
+    V --> D
+```
 
 ## 🛠️ Setup
 Get `tatto_pkg` package.
