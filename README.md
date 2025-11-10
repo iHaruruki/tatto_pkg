@@ -31,7 +31,7 @@ colcon build --packages-select tatto_pkg
 source install/setup.bash
 ```
 ## 🎮 How to use
-### Launch Tatto / 起動する
+### Launch Tatto / Tattoを起動する
 Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
