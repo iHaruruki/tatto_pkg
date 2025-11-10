@@ -9,17 +9,18 @@ Build
 ```bash
 cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
+source install/setup.bash
 ```
 ## How to use
 Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
 ```
-Run serial connection
+Run serial connection.
 ```bash
 ros2 run tatto_pkg tatto_serial_node
 ```
-Run display 
+Run display.
 ```bash
 ros2 run tatto_pkg tatto_display_node
 ```
