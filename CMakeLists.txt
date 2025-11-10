@@ -20,10 +20,17 @@ ament_target_dependencies(tatto_serial_node
   geometry_msgs
 )
 
-target_link_libraries(tatto_serial_node ${OpenCV_LIBS})
+add_executable(tatto_display_node src/tatto_display.cpp)
+ament_target_dependencies(tatto_display_node
+  rclcpp
+  std_msgs
+  geometry_msgs
+)
+target_link_libraries(tatto_display_node ${OpenCV_LIBS})
+
 
 install(TARGETS
-  tatto_serial_node
+  tatto_serial_node tatto_display_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
