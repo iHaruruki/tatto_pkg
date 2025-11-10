@@ -33,6 +33,7 @@ ros2 bag record -a
 ```
 ros2 bag play / 録画したものを再生する
 ```bash
+cd ~/ros2_ws/rosbag
 # ros2 bag play <file name>
 ros2 bag play 
 ```
