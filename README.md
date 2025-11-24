@@ -203,3 +203,8 @@ ros2 run tatto_pkg topic_sub_node
 ## 📚 Reference
 ROS 2 Official documentation
 - [ROS 2-jazzy](https://docs.ros.org/en/jazzy/index.html)
+
+## :bust_in_silhouette: Author
+- [shotaarai1124](https://github.com/shotaarai1124)
+- [sobasuki](https://github.com/sobasuki)
+- [iHaruruki](https://github.com/iHaruruki)
