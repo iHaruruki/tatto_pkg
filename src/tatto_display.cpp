@@ -59,10 +59,14 @@ private:
       float denom = std::max(1.0f, 250.0f - fixed_min);
       float normalized = mh / denom;
       s[7] = std::clamp(normalized, 0.0f, 1.0f);
+      s[7] = 0.5;
     }
     // -----------------------------------------------
-
-    // 描画
+    //ch0 
+    s[0] += 0.2;
+    if(s[0] > 1)s[0] = 1;
+    //------------------------------------------------
+    // 描画 drowing
     img_ = cv::Scalar(255,255,255);
     const float sc = 0.7071f;
     const int ab   = image_side_ / 2;
@@ -83,11 +87,11 @@ private:
     };
 
     for (int k = 0; k < 9; ++k) {
-      int radius = static_cast<int>(35*image_scale + (65*image_scale * s[k]));
+      int radius = static_cast<int>(15*image_scale + (65*image_scale * s[k]));
       cv::circle(img_, positions[k], radius, cv::Scalar(255, 0, 0), 2);
     }
 
-    // 重心
+    //代表点 reference point
     float sumw = 0.f, wx = 0.f, wy = 0.f;
     for (int k = 0; k < 9; ++k) {
       wx += s[k] * positions[k].x;
@@ -100,9 +104,9 @@ private:
       cy = static_cast<int>(wy / sumw);
     }
 
-    cv::circle(img_, {250*image_scale,250*image_scale}, 150*image_scale, cv::Scalar(255,0,0), 3);
-    cv::circle(img_, {250*image_scale,250*image_scale},  75*image_scale, cv::Scalar(100,100,0), 3);
-    cv::circle(img_, {cx, cy}, 10, cv::Scalar(0,0,255), -1);
+    //cv::circle(img_, {250*image_scale,250*image_scale}, 150*image_scale, cv::Scalar(255,0,0), 3);
+    //cv::circle(img_, {250*image_scale,250*image_scale},  75*image_scale, cv::Scalar(100,100,0), 3);
+    cv::circle(img_, {(cx-ab)*6+ab, (cy-ab)*6+ab}, 10, cv::Scalar(0,0,255), -1);//drow reference point
 
     cv::imshow("img", img_);
     cv::waitKey(1);
