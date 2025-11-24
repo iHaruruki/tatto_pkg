@@ -17,7 +17,7 @@ public:
 
     img_ = cv::Mat(image_side_, image_side_, CV_8UC3, cv::Scalar(255,255,255));
 
-    // 並び替え済みの sensor_values のみ購読
+    // 並び替え済みの sensor_values のみ購読 / Subscribe to sensor_values ​​only
     sub_vals_ = this->create_subscription<std_msgs::msg::UInt16MultiArray>(
       "sensor_values", 10, std::bind(&SensorDisplayNode::on_values, this, _1));
 
@@ -33,7 +33,7 @@ private:
     if (msg->data.size() != 9) return;
     const std::vector<uint16_t> &bset_s = msg->data;
 
-    // 全センサが閾値 border より大きいときだけ描画（元コード準拠）
+    // 全センサが閾値 border より大きいときだけ描画 / Draw only when all sensors are greater than the threshold border
     const int border = 30;
     bool above_border = true;
     for (int k = 0; k < 9; ++k) {
@@ -41,7 +41,7 @@ private:
     }
     if (!above_border) return;
 
-    // --- 固定の最小/最大で正規化（要求どおり） ---
+    // --- 固定の最小/最大で正規化 / Normalization---
     // 最小は 0、通常の最大 (scor) = 1000、ただし ch7 (index 7) は最大 250 の特例
     const float fixed_min = 0.0f;
     const float scor = 1000.0f;
@@ -66,7 +66,7 @@ private:
     s[0] += 0.2;
     if(s[0] > 1)s[0] = 1;
     //------------------------------------------------
-    // 描画 drowing
+    // 描画 / drowing
     img_ = cv::Scalar(255,255,255);
     const float sc = 0.7071f;
     const int ab   = image_side_ / 2;
@@ -91,7 +91,7 @@ private:
       cv::circle(img_, positions[k], radius, cv::Scalar(255, 0, 0), 2);
     }
 
-    //代表点 reference point
+    //代表点 / reference point
     float sumw = 0.f, wx = 0.f, wy = 0.f;
     for (int k = 0; k < 9; ++k) {
       wx += s[k] * positions[k].x;
@@ -108,7 +108,7 @@ private:
     //cv::circle(img_, {250*image_scale,250*image_scale},  75*image_scale, cv::Scalar(100,100,0), 3);
     cv::circle(img_, {(cx-ab)*6+ab, (cy-ab)*6+ab}, 10, cv::Scalar(0,0,255), -1);//drow reference point
 
-    cv::imshow("img", img_);
+    cv::imshow("Display Node", img_);
     cv::waitKey(1);
   }
 
