@@ -195,7 +195,7 @@ cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
 source install/setup.bash
 ```
-- 実行する  
+- 実行する / Execute
 ```bash
 ros2 run tatto_pkg topic_sub_node
 ```
