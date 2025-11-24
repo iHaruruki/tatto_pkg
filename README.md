@@ -80,7 +80,7 @@ ros2 run tatto_pkg tatto_display_node
 ```
 
 
-## :ghost: ROS 2 のプログラムを書いてみる！ 
+## :ghost: ROS 2 のプログラムを書いてみる！ / Let's write a ROS 2 program!
 ### Node & Topic / NodeとTopicとは？
 - What is Node? / Nodeとは？  
 Role: The smallest unit of a ROS 2 application (an object within a process). Each node handles a single responsibility such as sensor reading, inference, or control.  
