@@ -92,9 +92,9 @@ Role: A communication channel for stream-type messages between nodes in a loosel
 役割：ノード間で非同期で情報のやりとりを行うメッセージ  
 Official documentation: [Understanding topics](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
 
-### tattoのプログラムを書いてみる
-#### `/sensor_values` topicを受信して，topicの値を表示するプログラムを作成する
-- ソースコードは`src`ディレクトリ内に置く  
+### tattoのプログラムを書いてみる / Writing a tatto program on ROS2
+#### `/sensor_values` topicを受信して，topicの値を表示するプログラムを作成する / Create a program that receives the `/sensor_values` topic and displays the topic value.  
+- ソースコードは`src`ディレクトリ内に置く / The source code is placed in the `src` directory.  
 `subscribe_topic.cpp`
 ```cpp
 #include <rclcpp/rclcpp.hpp>
@@ -138,7 +138,7 @@ int main(int argc, char** argv) {
   return 0;
 }
 ```
-- ビルドのためにCMakeLists.txtファイルを編集する  
+- ビルドのためにCMakeLists.txtファイルを編集する / Edit the CMakeLists.txt file for the build
 `CMakeLists.txt`
 ```cmake
 cmake_minimum_required(VERSION 3.8)
@@ -171,7 +171,7 @@ ament_target_dependencies(tatto_display_node
 )
 target_link_libraries(tatto_display_node ${OpenCV_LIBS})
 
-##### --------------新しく加える------------------------ #####
+##### --------------新しく加える/Add new------------------------ #####
 add_executable(topic_sub_node src/subscribe_topic.cpp)
 ament_target_dependencies(subscribe_topic.cpp
   rclcpp
@@ -180,7 +180,7 @@ ament_target_dependencies(subscribe_topic.cpp
 )
 ##### -------------------------------------------------- #####
 
-### "install"内の`topic_sub_node`を新しく加える ###
+### "install"内の`topic_sub_node`を新しく加える/Add a new `topic_sub_node` in "install" ###
 install(TARGETS
   tatto_serial_node tatto_display_node topic_sub_node
   DESTINATION lib/${PROJECT_NAME}
@@ -189,7 +189,7 @@ install(TARGETS
 ament_package()
 ```
 
-- Buildする  
+- Buildする / Build
 ```bash
 cd ~/ros2_ws
 colcon build --packages-select tatto_pkg
