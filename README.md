@@ -22,6 +22,11 @@ flowchart LR
 ```
 
 ## 🛠️ Setup
+> [!NOTE]
+> Is your ROS2 environment ready?  
+> [ros2 install](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debs.html)
+
+
 Get `tatto_pkg` package.
 ```bash
 cd ~/ros2_ws/src
