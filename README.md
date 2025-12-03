@@ -46,8 +46,10 @@ sudo chmod 666 /dev/ttyUSB0
 ```
 > [!NOTE]
 > Please check USB port and change `launch/tatto_serial.launch.py` file.
-> ```python
-> import os
+> USB portのを確認し，launchファイルを変更する
+`launch/tatto_serial.launch.py`
+```python
+import os
   from ament_index_python.packages import get_package_share_directory
   from launch import LaunchDescription
   from launch.actions import DeclareLaunchArgument
@@ -68,7 +70,7 @@ sudo chmod 666 /dev/ttyUSB0
           ),
           
       ])
-> ```
+```
 
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
