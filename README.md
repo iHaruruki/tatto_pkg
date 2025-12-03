@@ -129,7 +129,7 @@ Role: A communication channel for stream-type messages between nodes in a loosel
 Official documentation: [Understanding topics](https://docs.ros.org/en/jazzy/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html)
 
 ### tattoのプログラムを書いてみる / Writing a tatto program on ROS2
-#### `/sensor_values` topicを受信して，topicの値を表示するプログラムを作成する / Create a program that receives the `/sensor_values` topic and displays the topic value.  
+`/sensor_values` topicを受信して，topicの値を表示するプログラムを作成する / Create a program that receives the `/sensor_values` topic and displays the topic value.  
 - ソースコードは`src`ディレクトリ内に置く / The source code is placed in the `src` directory.  
 `subscribe_topic.cpp`
 ```cpp
