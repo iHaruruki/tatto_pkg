@@ -44,9 +44,15 @@ Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
 ```
+> [!NOTE]
+> Please check USB port and change `launch/tatto_serial.launch.py` file.
+> ```python
+> hello
+> ```
+
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 run tatto_pkg tatto_serial_node
+ros2 launch tatto_serial.launch.py
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash
