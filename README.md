@@ -45,7 +45,7 @@ Changes the permissions on the device file.
 sudo chmod 666 /dev/ttyUSB0
 ```
 > [!NOTE]
-> Please check USB port and change `launch/tatto_serial.launch.py` file.
+> Please check USB port and change `launch/tatto_serial.launch.py` file.  
 > USB portのを確認し，launchファイルを変更する
 `launch/tatto_serial.launch.py`
 ```python
