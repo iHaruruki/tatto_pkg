@@ -71,7 +71,11 @@ import os
           
       ])
 ```
-
+Build
+```bash
+cd ~/ros2_ws
+colcon build --packages-select tatto_pkg
+```
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
 ros2 launch tatto_serial.launch.py
@@ -80,7 +84,7 @@ Run `sensor_display_node` / ディスプレイに表示
 ```bash
 ros2 run tatto_pkg tatto_display_node
 ```
-topic echo / センサの値を見る
+To see the data being published on a topic / センサの値を見る
 ```bash
 ros2 topic echo /sensor_values
 ```
@@ -89,13 +93,17 @@ Sensor placement / センサの配置位置
 
 ### Record sensor values / センサデータを記録する
 ros2 bag record / センサの値を記録する
+> With `sensor_reader_node` and `sensor_display_node` running, enter the following command.  
+> `sensor_reader_node`と`sensor_display_node`を起動したまま，以下のコマンドを入力する
 ```bash
 cd ~/ros2_ws/rosbag
 ros2 bag record -a
 ```
 ros2 bag play / 記録したものを再生する
+> Now that the sensor_reader_node has stopped, enter the following command:
+> `sensor_reader_node`は停止したから，以下のコマンドを入力
 ```bash
-# ros2 bag play <file name　ここにディレクトリのパスを書く>
+# ros2 bag play <The path to the directory where the record data is saved　ここにディレクトリのパスを書く>
 ros2 bag play $HOME/ros2_ws/rosbag/rosbag2_2025_11_10-17_46_24/
 ```
 topic echo / センサの値を見る
