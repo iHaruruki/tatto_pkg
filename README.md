@@ -93,6 +93,7 @@ Sensor placement / センサの配置位置
 
 ### Record sensor values / センサデータを記録する
 ros2 bag record / センサの値を記録する
+> [!TIP]
 > With `sensor_reader_node` and `sensor_display_node` running, enter the following command.  
 > `sensor_reader_node`と`sensor_display_node`を起動したまま，以下のコマンドを入力する
 ```bash
@@ -100,6 +101,7 @@ cd ~/ros2_ws/rosbag
 ros2 bag record -a
 ```
 ros2 bag play / 記録したものを再生する
+> [!TIP]
 > Now that the sensor_reader_node has stopped, enter the following command:
 > `sensor_reader_node`は停止したから，以下のコマンドを入力
 ```bash
