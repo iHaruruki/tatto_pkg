@@ -36,7 +36,7 @@ public:
       RCLCPP_ERROR(get_logger(), "Serial init failed. Node will run but publish nothing.");
     }
 
-    timer_ = this->create_wall_timer(20ms, std::bind(&SensorReaderNode::on_timer, this));
+    timer_ = this->create_wall_timer(30ms, std::bind(&SensorReaderNode::on_timer, this));
   }
 
   ~SensorReaderNode() override {
