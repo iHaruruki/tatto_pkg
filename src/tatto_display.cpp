@@ -34,10 +34,13 @@ private:
     const std::vector<uint16_t> &bset_s = msg->data;
 
     // 全センサが閾値 border より大きいときだけ描画 / Draw only when all sensors are greater than the threshold border
-    const int border = 30;
+    const int low = 30;
+    const int high = 2000;
     bool above_border = true;
     for (int k = 0; k < 9; ++k) {
-      if (static_cast<int>(bset_s[k]) <= border) { above_border = false; break; }
+      if (static_cast<int>(bset_s[k]) <= low || static_cast<int>(bset_s[k]) > high){
+      	above_border = false; break;
+      }
     }
     if (!above_border) return;
 

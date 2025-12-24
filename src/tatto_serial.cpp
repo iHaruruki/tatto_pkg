@@ -20,7 +20,7 @@ public:
     serial_port_(-1),
     calibrated_(false)
   {
-    this->declare_parameter<std::string>("port", "/dev/ttyUSB0");
+    this->declare_parameter<std::string>("port", "/dev/ttyUSB1");
     this->declare_parameter<int>("baud", 115200);
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
@@ -36,7 +36,7 @@ public:
       RCLCPP_ERROR(get_logger(), "Serial init failed. Node will run but publish nothing.");
     }
 
-    timer_ = this->create_wall_timer(50ms, std::bind(&SensorReaderNode::on_timer, this));
+    timer_ = this->create_wall_timer(20ms, std::bind(&SensorReaderNode::on_timer, this));
   }
 
   ~SensorReaderNode() override {
@@ -147,6 +147,10 @@ private:
         calibrated_ = true;
         RCLCPP_INFO(get_logger(), "Calibration complete for 9 sensors.");
       }
+    }
+    
+    for(int i=0; i < 9; i++){
+    	if(bset_[i] > 2000) break;
     }
 
     // 並べ替え

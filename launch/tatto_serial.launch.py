@@ -14,7 +14,7 @@ def generate_launch_description():
             name='tatto_serial_node',
             output='screen',
             parameters=[{
-                'port': '/dev/ttyUSB1', # Please check USB port
+                'port': '/dev/ttyUSB0', # Please check USB port
             }]
         ),
         
