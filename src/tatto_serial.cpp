@@ -37,6 +37,9 @@ public:
     }
 
     timer_ = this->create_wall_timer(50ms, std::bind(&SensorReaderNode::on_timer, this));
+    RCLCPP_INFO(get_logger(), "Publishing topics at 20Hz (50ms interval)");
+    RCLCPP_INFO(get_logger(), "  - /sensor_values_raw (raw sensor data)");
+    RCLCPP_INFO(get_logger(), "  - /sensor_values (reordered sensor data)");
   }
 
   ~SensorReaderNode() override {

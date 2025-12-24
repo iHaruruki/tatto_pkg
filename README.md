@@ -21,6 +21,20 @@ flowchart LR
     V --> D
 ```
 
+### Topic Publishing Frequency / トピック配信周期
+The `sensor_reader_node` publishes sensor data at **20Hz** (50ms interval):
+- `/sensor_values_raw` - Raw sensor data from all 9 sensors
+- `/sensor_values` - Reordered sensor data according to physical layout
+
+`sensor_reader_node`は**20Hz**（50msごと）でセンサデータを配信します：
+- `/sensor_values_raw` - 9個のセンサからの生データ
+- `/sensor_values` - 物理的なレイアウトに合わせて並び替えられたセンサデータ
+
+To verify the publishing rate, use:
+```bash
+ros2 topic hz /sensor_values
+```
+
 ## 🛠️ Setup
 > [!NOTE]
 > Is your ROS2 environment ready?  
