@@ -78,7 +78,7 @@ colcon build --packages-select tatto_pkg
 ```
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 launch tatto_serial.launch.py
+ros2 launch tatto_pkg tatto_serial.launch.py
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash
