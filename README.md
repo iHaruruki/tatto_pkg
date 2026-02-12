@@ -45,7 +45,7 @@ Changes the permissions on the device file.
 sudo chmod 666 /dev/ttyUSB0
 ```
 > [!NOTE]
-> Please check USB port and change `launch/tatto_serial.launch.py` file.  
+> Please check USB port and change `launch/tatto_pkg tatto_serial.launch.py` file.  
 > USB portのを確認し，launchファイルを変更する
 `launch/tatto_serial.launch.py`
 ```python
@@ -78,7 +78,7 @@ colcon build --packages-select tatto_pkg
 ```
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 launch tatto_serial.launch.py
+ros2 launch tatto_pkg tatto_serial.launch.py
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash
