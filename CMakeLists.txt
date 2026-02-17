@@ -28,9 +28,17 @@ ament_target_dependencies(tatto_display_node
 )
 target_link_libraries(tatto_display_node ${OpenCV_LIBS})
 
+add_executable(tatto_touch_detector_node src/tatto_touch_detector.cpp)
+ament_target_dependencies(tatto_touch_detector_node
+  rclcpp
+  std_msgs
+)
+
 
 install(TARGETS
-  tatto_serial_node tatto_display_node
+  tatto_serial_node 
+  tatto_display_node
+  tatto_touch_detector_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
