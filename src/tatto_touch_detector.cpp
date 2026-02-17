@@ -3,7 +3,6 @@
 #include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <numeric>
-#include <algorithm>
 
 class SensorThresholdNode : public rclcpp::Node
 {
@@ -33,8 +32,7 @@ public:
         average_pub_ = this->create_publisher<std_msgs::msg::Float64>("/sensor_average", 10);
         threshold_pub_ = this->create_publisher<std_msgs::msg::Bool>("/sensor_threshold_exceeded", 10);
         
-        RCLCPP_INFO(this->get_logger(), "sensor_threshold_node を起動しました。");
-        RCLCPP_INFO(this->get_logger(), "しきい値: %d, ��ンサー数: %d", threshold_, sensor_count_);
+        RCLCPP_INFO(this->get_logger(), "sensor_threshold_node started (threshold: %d)", threshold_);
     }
 
 private:
@@ -44,9 +42,6 @@ private:
         
         // センサー数のチェック
         if (static_cast<int>(data.size()) != sensor_count_) {
-            RCLCPP_WARN(this->get_logger(), 
-                "センサー数が一致しません。期待: %d, 受信: %zu", 
-                sensor_count_, data.size());
             return;
         }
         
@@ -55,16 +50,6 @@ private:
         
         // しきい値判定
         bool exceeded = average >= threshold_;
-        
-        // 統計更新
-        total_count_++;
-        if (exceeded) {
-            exceed_count_++;
-        }
-        
-        // 最小値・最大値を計算
-        uint16_t min_val = *std::min_element(data.begin(), data.end());
-        uint16_t max_val = *std::max_element(data.begin(), data.end());
         
         // 平均値をパブリッシュ
         auto avg_msg = std_msgs::msg::Float64();
@@ -75,21 +60,6 @@ private:
         auto status_msg = std_msgs::msg::Bool();
         status_msg.data = exceeded;
         threshold_pub_->publish(status_msg);
-        
-        // ログ出力（しきい値超過時のみ）
-        if (exceeded) {
-            double exceed_rate = (total_count_ > 0) 
-                ? static_cast<double>(exceed_count_) / total_count_ * 100.0
-                : 0.0;
-            
-            RCLCPP_INFO(this->get_logger(), 
-                "しきい値超過！ 平均: %.2f >= %d (Min: %d, Max: %d) [超過率: %.1f%% (%d/%d)]",
-                average, threshold_, min_val, max_val, exceed_rate, exceed_count_, total_count_);
-        } else {
-            RCLCPP_DEBUG(this->get_logger(), 
-                "正常範囲: 平均: %.2f < %d (Min: %d, Max: %d)", 
-                average, threshold_, min_val, max_val);
-        }
     }
     
     // メンバ変数
@@ -99,8 +69,6 @@ private:
     
     int threshold_;
     int sensor_count_;
-    int total_count_ = 0;
-    int exceed_count_ = 0;
 };
 
 int main(int argc, char** argv)
