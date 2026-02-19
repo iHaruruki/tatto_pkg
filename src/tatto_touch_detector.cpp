@@ -50,11 +50,13 @@ private:
         
         // 平均値を計算
         double average = std::accumulate(data.begin(), data.end(), 0.0) / data.size();
+
+        bool exceeded = false;  // Initialize to false
         
         // しきい値判定
         if(average >= threshold_)
         {
-            bool exceeded = true;
+            exceeded = true;
             std::string speeach_text = "タットを触ってくれてありがとう！";
 
             // Publish tts text
@@ -62,7 +64,6 @@ private:
             tts_msg.data = speeach_text;
             tts_pub_->publish(tts_msg);
         }
-        bool exceeded = false;  // Initialize to false
         
         // 平均値をパブリッシュ
         auto avg_msg = std_msgs::msg::Float64();
