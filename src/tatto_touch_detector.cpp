@@ -12,7 +12,7 @@ public:
     SensorThresholdNode() : Node("sensor_threshold_node")
     {
         // パラメータ宣言
-        this->declare_parameter<int>("threshold", 600);
+        this->declare_parameter<int>("threshold", 800);
         this->declare_parameter<int>("sensor_count", 9);
         
         // パラメータ取得
@@ -51,19 +51,24 @@ private:
         // 平均値を計算
         double average = std::accumulate(data.begin(), data.end(), 0.0) / data.size();
 
-        bool exceeded = false;  // Initialize to false
+         // しきい値判定
+        bool exceeded = (average >= threshold_);
         
-        // しきい値判定
-        if(average >= threshold_)
+        // しきい値を超えた瞬間だけTTSを送信（前回false → 今回true）
+        if(exceeded && !prev_exceeded_)
         {
-            exceeded = true;
-            std::string speeach_text = "タットを触ってくれてありがとう！";
+            std::string speech_text = "タットを触ってくれてありがとう！";
 
             // Publish tts text
             auto tts_msg = std_msgs::msg::String();
-            tts_msg.data = speeach_text;
+            tts_msg.data = speech_text;
             tts_pub_->publish(tts_msg);
+            
+            RCLCPP_INFO(this->get_logger(), "Threshold exceeded! TTS sent. (average: %.2f)", average);
         }
+        
+        // 前回の状態を更新
+        prev_exceeded_ = exceeded;
         
         // 平均値をパブリッシュ
         auto avg_msg = std_msgs::msg::Float64();
@@ -84,6 +89,7 @@ private:
     
     int threshold_;
     int sensor_count_;
+    bool prev_exceeded_;  // 前回のしきい値超過状態
 };
 
 int main(int argc, char** argv)
