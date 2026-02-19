@@ -9,15 +9,19 @@
 class SensorThresholdNode : public rclcpp::Node
 {
 public:
-    SensorThresholdNode() : Node("sensor_threshold_node")
+    SensorThresholdNode() : Node("sensor_threshold_node"), 
+                            prev_exceeded_(false),
+                            last_tts_time_(this->now() - rclcpp::Duration(15, 0))  // 起動時は10秒前に初期化
     {
         // パラメータ宣言
         this->declare_parameter<int>("threshold", 800);
         this->declare_parameter<int>("sensor_count", 9);
+        this->declare_parameter<double>("tts_interval", 8.0);  // TTS送信間隔（秒）
         
         // パラメータ取得
         threshold_ = this->get_parameter("threshold").as_int();
         sensor_count_ = this->get_parameter("sensor_count").as_int();
+        tts_interval_ = this->get_parameter("tts_interval").as_double();
         
         // QoS設定
         auto qos = rclcpp::QoS(rclcpp::KeepLast(1))
@@ -35,7 +39,9 @@ public:
         threshold_pub_ = this->create_publisher<std_msgs::msg::Bool>("/sensor_threshold_exceeded", 10);
         tts_pub_ = this->create_publisher<std_msgs::msg::String>("/voicevox_tts_text", 30);
         
-        RCLCPP_INFO(this->get_logger(), "sensor_threshold_node started (threshold: %d)", threshold_);
+        RCLCPP_INFO(this->get_logger(), 
+                    "sensor_threshold_node started (threshold: %d, tts_interval: %.1f sec)", 
+                    threshold_, tts_interval_);
     }
 
 private:
@@ -50,21 +56,37 @@ private:
         
         // 平均値を計算
         double average = std::accumulate(data.begin(), data.end(), 0.0) / data.size();
-
-         // しきい値判定
+        
+        // しきい値判定
         bool exceeded = (average >= threshold_);
         
-        // しきい値を超えた瞬間だけTTSを送信（前回false → 今回true）
+        // しきい値を超えた瞬間だけTTSを送信
         if(exceeded && !prev_exceeded_)
         {
-            std::string speech_text = "タットを触ってくれてありがとう！";
-
-            // Publish tts text
-            auto tts_msg = std_msgs::msg::String();
-            tts_msg.data = speech_text;
-            tts_pub_->publish(tts_msg);
+            // 前回のTTS送信から指定秒数以上経過しているかチェック
+            rclcpp::Time current_time = this->now();
+            rclcpp::Duration elapsed = current_time - last_tts_time_;
             
-            RCLCPP_INFO(this->get_logger(), "Threshold exceeded! TTS sent. (average: %.2f)", average);
+            if (elapsed.seconds() >= tts_interval_)
+            {
+                std::string speech_text = "タットを触ってくれてありがとう！";
+
+                // Publish tts text
+                auto tts_msg = std_msgs::msg::String();
+                tts_msg.data = speech_text;
+                tts_pub_->publish(tts_msg);
+                
+                // 送信時刻を更新
+                last_tts_time_ = current_time;
+                
+                RCLCPP_INFO(this->get_logger(), 
+                           "Threshold exceeded! TTS sent. (average: %.2f)", average);
+            }
+            else
+            {
+                RCLCPP_DEBUG(this->get_logger(), 
+                            "TTS skipped (%.1f sec since last TTS)", elapsed.seconds());
+            }
         }
         
         // 前回の状態を更新
@@ -89,7 +111,9 @@ private:
     
     int threshold_;
     int sensor_count_;
-    bool prev_exceeded_;  // 前回のしきい値超過状態
+    double tts_interval_;           // TTS送信間隔（秒）
+    bool prev_exceeded_;            // 前回のしきい値超過状態
+    rclcpp::Time last_tts_time_;    // 最後にTTSを送信した時刻
 };
 
 int main(int argc, char** argv)
