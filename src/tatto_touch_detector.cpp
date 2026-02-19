@@ -2,7 +2,9 @@
 #include <std_msgs/msg/u_int16_multi_array.hpp>
 #include <std_msgs/msg/float64.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>
 #include <numeric>
+#include <string>
 
 class SensorThresholdNode : public rclcpp::Node
 {
@@ -31,6 +33,7 @@ public:
         // パブリッシャー
         average_pub_ = this->create_publisher<std_msgs::msg::Float64>("/sensor_average", 10);
         threshold_pub_ = this->create_publisher<std_msgs::msg::Bool>("/sensor_threshold_exceeded", 10);
+        tts_pub_ = this->create_publisher<std_msgs::msg::String>("/voicevox_tts_text", 30);
         
         RCLCPP_INFO(this->get_logger(), "sensor_threshold_node started (threshold: %d)", threshold_);
     }
@@ -49,7 +52,17 @@ private:
         double average = std::accumulate(data.begin(), data.end(), 0.0) / data.size();
         
         // しきい値判定
-        bool exceeded = average >= threshold_;
+        if(average >= threshold_)
+        {
+            bool exceeded = true;
+            std::string speeach_text = "タットを触ってくれてありがとう！";
+
+            // Publish tts text
+            auto tts_msg = std_msgs::msg::String();
+            tts_msg.data = speeach_text;
+            tts_pub_->publish(tts_msg);
+        }
+        bool exceeded = false;  // Initialize to false
         
         // 平均値をパブリッシュ
         auto avg_msg = std_msgs::msg::Float64();
@@ -59,13 +72,14 @@ private:
         // しきい値超過ステータスをパブリッシュ
         auto status_msg = std_msgs::msg::Bool();
         status_msg.data = exceeded;
-        threshold_pub_->publish(status_msg);
+        threshold_pub_->publish(status_msg);   
     }
     
     // メンバ変数
     rclcpp::Subscription<std_msgs::msg::UInt16MultiArray>::SharedPtr sensor_sub_;
     rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr average_pub_;
     rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr threshold_pub_;
+    rclcpp::Publisher<std_msgs::msg::String>::SharedPtr tts_pub_;
     
     int threshold_;
     int sensor_count_;
