@@ -16,8 +16,8 @@ class SensorReaderNode : public rclcpp::Node {
 public:
   SensorReaderNode()
   : Node("sensor_reader_node"),
-    payload_size_(9 * 2),
     serial_port_(-1),
+    payload_size_(9 * 2),
     calibrated_(false)
   {
     this->declare_parameter<std::string>("port", "/dev/ttyUSB0");

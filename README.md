@@ -40,14 +40,17 @@ source install/setup.bash
 ```
 ## 🎮 How to use
 ### Launch Tatto / Tattoを起動する
+Check USB conection
+```bash
+ls /dev/ttyUSB*
+```
+```bash
+/dev/ttyUSB0
+```
 Changes the permissions on the device file.
 ```bash
 sudo chmod 666 /dev/ttyUSB0
 ```
-> [!NOTE]
-> Please check USB port and change `launch/tatto_serial.launch.py` file.  
-> USB portのを確認し，launchファイルを変更する
-
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
 ros2 run tatto_pkg tatto_serial_node --ros-args -p port:=/dev/ttyUSB0
@@ -60,6 +63,11 @@ To see the data being published on a topic / センサの値を見る
 ```bash
 ros2 topic echo /sensor_values
 ```
+Export topics in CSV format. / トピックをCSV形式で出力
+```bash
+ros2 topic echo /sensor_values --csv > output.csv
+```
+
 Sensor placement / センサの配置位置  
 <img src="media/IMG_3870.jpg" alt="sensor placement" style="width:30%;height:auto;">
 
