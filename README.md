@@ -47,38 +47,10 @@ sudo chmod 666 /dev/ttyUSB0
 > [!NOTE]
 > Please check USB port and change `launch/tatto_serial.launch.py` file.  
 > USB portのを確認し，launchファイルを変更する
-`launch/tatto_serial.launch.py`
-```python
-import os
-  from ament_index_python.packages import get_package_share_directory
-  from launch import LaunchDescription
-  from launch.actions import DeclareLaunchArgument
-  from launch.substitutions import LaunchConfiguration
-  from launch_ros.actions import Node
 
-  def generate_launch_description():
-      
-      return LaunchDescription([
-          Node(
-              package='tatto_pkg',
-              executable='tatto_serial_node',
-              name='tatto_serial_node',
-              output='screen',
-              parameters=[{
-                  'port': '/dev/ttyUSB1', # Please check USB port
-              }]
-          ),
-          
-      ])
-```
-Build
-```bash
-cd ~/ros2_ws
-colcon build --packages-select tatto_pkg
-```
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 launch tatto_pkg tatto_serial.launch.py
+ros2 run tatto_pkg tatto_serial_node --ros-args -p port:=/dev/ttyUSB0
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash

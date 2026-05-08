@@ -20,7 +20,7 @@ public:
     serial_port_(-1),
     calibrated_(false)
   {
-    this->declare_parameter<std::string>("port", "/dev/ttyUSB1");
+    this->declare_parameter<std::string>("port", "/dev/ttyUSB0");
     this->declare_parameter<int>("baud", 115200);
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
