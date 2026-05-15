@@ -4,7 +4,7 @@
   <name>tatto_pkg</name>
   <version>1.0.0</version>
   <description>Tatto package</description>
-  <maintainer email="haruki.isono861@gmail.com">HarukiIsono</maintainer>
+  <maintainer email="haruki.isono861@gmail.com">Haruki Isono</maintainer>
   <license>TODO: License declaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -13,7 +13,6 @@
   <build_depend>std_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <build_depend>opencv</build_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
