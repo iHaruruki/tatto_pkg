@@ -34,11 +34,18 @@ ament_target_dependencies(tatto_touch_detector_node
   std_msgs
 )
 
+add_executable(tatto_normalization_node src/tatto_normalization.cpp)
+ament_target_dependencies(tatto_normalization_node
+  rclcpp
+  std_msgs
+)
+
 
 install(TARGETS
   tatto_serial_node 
   tatto_display_node
   tatto_touch_detector_node
+  tatto_normalization_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
