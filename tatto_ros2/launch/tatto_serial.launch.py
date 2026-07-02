@@ -9,7 +9,7 @@ def generate_launch_description():
     
     return LaunchDescription([
         Node(
-            package='tatto_pkg',
+            package='tatto_ros2',
             executable='tatto_serial_node',
             name='tatto_serial_node',
             output='screen',
