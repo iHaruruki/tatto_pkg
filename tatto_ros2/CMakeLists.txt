@@ -12,12 +12,14 @@ find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(tatto_ros2_msgs)
 
 add_executable(tatto_serial_node src/tatto_serial.cpp)
 ament_target_dependencies(tatto_serial_node
   rclcpp
   std_msgs
   geometry_msgs
+  tatto_ros2_msgs
 )
 
 add_executable(tatto_display_node src/tatto_display.cpp)
@@ -25,6 +27,7 @@ ament_target_dependencies(tatto_display_node
   rclcpp
   std_msgs
   geometry_msgs
+  tatto_ros2_msgs
 )
 target_link_libraries(tatto_display_node ${OpenCV_LIBS})
 
@@ -32,12 +35,14 @@ add_executable(tatto_touch_detector_node src/tatto_touch_detector.cpp)
 ament_target_dependencies(tatto_touch_detector_node
   rclcpp
   std_msgs
+  tatto_ros2_msgs
 )
 
 add_executable(tatto_normalization_node src/tatto_normalization.cpp)
 ament_target_dependencies(tatto_normalization_node
   rclcpp
   std_msgs
+  tatto_ros2_msgs
 )
 
 

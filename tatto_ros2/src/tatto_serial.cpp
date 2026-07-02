@@ -1,5 +1,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/u_int16_multi_array.hpp>
+#include <tatto_ros2_msgs/msg/sensor_array.hpp>
 #include <chrono>
 #include <vector>
 #include <string>
@@ -25,8 +26,8 @@ public:
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
 
-    pub_raw_       = this->create_publisher<std_msgs::msg::UInt16MultiArray>("sensor_values_raw", 10);
-    pub_reordered_ = this->create_publisher<std_msgs::msg::UInt16MultiArray>("sensor_values", 10);
+    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("sensor_values_raw", 10);
+    pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("sensor_values", 10);
 
     bset_.assign(9, 0);
     bset_prev_.assign(9, 0);
@@ -124,11 +125,15 @@ private:
       bset_[i] = static_cast<uint16_t>((hi << 8) | lo);
     }
 
+    const auto current_time = this->get_clock()->now();
+
     // Publish: raw
     {
-      std_msgs::msg::UInt16MultiArray msg;
-      msg.data.assign(bset_.begin(), bset_.end());
-      pub_raw_->publish(msg);
+      tatto_ros2_msgs::msg::SensorArray msg_raw;
+      msg_raw.header.stamp = current_time;
+      msg_raw.header.frame_id = "tatto_link";
+      msg_raw.data.assign(bset_.begin(), bset_.end());
+      pub_raw_->publish(msg_raw);
     }
 
     // 初回キャリブレーション
@@ -170,9 +175,11 @@ private:
 
     // Publish: 並び替え後
     {
-      std_msgs::msg::UInt16MultiArray msg;
-      msg.data.assign(bset_s.begin(), bset_s.end());
-      pub_reordered_->publish(msg);
+      tatto_ros2_msgs::msg::SensorArray msg_reordered;
+      msg_reordered.header.stamp = current_time;
+      msg_reordered.header.frame_id = "tatto_link";
+      msg_reordered.data.assign(bset_s.begin(), bset_s.end());
+      pub_reordered_->publish(msg_reordered);
     }
 
   }
@@ -192,8 +199,8 @@ private:
   rclcpp::TimerBase::SharedPtr timer_;
 
   // Publishers
-  rclcpp::Publisher<std_msgs::msg::UInt16MultiArray>::SharedPtr pub_raw_;
-  rclcpp::Publisher<std_msgs::msg::UInt16MultiArray>::SharedPtr pub_reordered_;
+  rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_raw_;
+  rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_reordered_;
 };
 
 int main(int argc, char** argv) {
