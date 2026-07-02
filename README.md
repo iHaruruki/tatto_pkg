@@ -35,7 +35,9 @@ git clone https://github.com/iHaruruki/tatto_pkg.git
 Build
 ```bash
 cd ~/ros2_ws
-colcon build --packages-select tatto_pkg
+colcon build --packages-select tatto_ros2_msgs
+source install/setup.bash
+colcon build --packages-select tatto_ros2
 source install/setup.bash
 ```
 ## 🎮 How to use
