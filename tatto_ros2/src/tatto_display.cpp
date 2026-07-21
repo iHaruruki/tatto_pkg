@@ -1,5 +1,5 @@
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/u_int16_multi_array.hpp>
+#include <tatto_ros2_msgs/msg/sensor_array.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <algorithm>
@@ -17,11 +17,10 @@ public:
 
     img_ = cv::Mat(image_side_, image_side_, CV_8UC3, cv::Scalar(255,255,255));
 
-    // 並び替え済みの sensor_values のみ購読 / Subscribe to sensor_values ​​only
-    sub_vals_ = this->create_subscription<std_msgs::msg::UInt16MultiArray>(
-      "sensor_values", 10, std::bind(&SensorDisplayNode::on_values, this, _1));
+    sub_vals_ = this->create_subscription<tatto_ros2_msgs::msg::SensorArray>(
+      "/tatto/sensor_values", 10, std::bind(&SensorDisplayNode::on_values, this, _1));
 
-    cv::namedWindow("img", cv::WINDOW_AUTOSIZE);
+    //cv::namedWindow("img", cv::WINDOW_AUTOSIZE);
   }
 
   ~SensorDisplayNode() override {
@@ -29,9 +28,21 @@ public:
   }
 
 private:
-  void on_values(const std_msgs::msg::UInt16MultiArray::SharedPtr msg) {
+  void on_values(const tatto_ros2_msgs::msg::SensorArray::SharedPtr msg) {
+
     if (msg->data.size() != 9) return;
+
+    const auto msg_time = rclcpp::Time(msg->header.stamp);
     const std::vector<uint16_t> &bset_s = msg->data;
+
+    const auto current_time = this->get_clock()->now();
+    const auto time_lag = (current_time - msg_time).seconds();
+    RCLCPP_DEBUG_STREAM(this->get_logger(),
+        "stamp: " << msg->header.stamp.sec << "." << msg->header.stamp.nanosec
+        << ", frame_id: " << msg->header.frame_id
+        << ", lag: " << time_lag << " s");
+    
+    if(time_lag > 0.1) return;  // 100[ms]
 
     // 全センサが閾値 border より大きいときだけ描画 / Draw only when all sensors are greater than the threshold border
     const int low = 30;
@@ -44,8 +55,6 @@ private:
     }
     if (!above_border) return;
 
-    // --- 固定の最小/最大で正規化 / Normalization---
-    // 最小は 0、通常の最大 (scor) = 1000、ただし ch7 (index 7) は最大 250 の特例
     const float fixed_min = 0.0f;
     const float scor = 1000.0f;
     std::vector<float> s(9, 0.0f);
@@ -64,11 +73,11 @@ private:
       s[7] = std::clamp(normalized, 0.0f, 1.0f);
       s[7] = 0.5;
     }
-    // -----------------------------------------------
+
     //ch0 
     s[0] += 0.2;
     if(s[0] > 1)s[0] = 1;
-    //------------------------------------------------
+
     // 描画 / drowing
     img_ = cv::Scalar(255,255,255);
     const float sc = 0.7071f;
@@ -115,7 +124,7 @@ private:
     cv::waitKey(1);
   }
 
-  rclcpp::Subscription<std_msgs::msg::UInt16MultiArray>::SharedPtr sub_vals_;
+  rclcpp::Subscription<tatto_ros2_msgs::msg::SensorArray>::SharedPtr sub_vals_;
 
   int image_side_;
   cv::Mat img_;
