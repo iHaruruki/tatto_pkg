@@ -1,5 +1,4 @@
 #include <rclcpp/rclcpp.hpp>
-#include <std_msgs/msg/u_int16_multi_array.hpp>
 #include <tatto_ros2_msgs/msg/sensor_array.hpp>
 #include <chrono>
 #include <vector>

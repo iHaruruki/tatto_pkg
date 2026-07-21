@@ -71,6 +71,10 @@ Export topics in CSV format. / トピックをCSV形式で出力
 ```bash
 ros2 topic echo /tatto/sensor_values --csv > output.csv
 ```
+csv format
+```csv
+stamp_sec, stamp_nanosec, frame_id, 0, data0, data1, data2, data3, data4, data5, data6, data7, data8
+```
 
 Sensor placement / センサの配置位置  
 <img src="media/IMG_3870.jpg" alt="sensor placement" style="width:30%;height:auto;">
