@@ -8,7 +8,7 @@ This is Tatto repository.
 ## 🧩 Nodes & Topics
 <!-- ![rosgraph](media/rosgraph.png) -->
 
-```mermaid
+<!-- ```mermaid
 flowchart LR
     %% Nodes
     S([/sensor_reader_node])
@@ -19,7 +19,7 @@ flowchart LR
 
     S --> V
     V --> D
-```
+``` -->
 
 ## 🛠️ Setup
 > [!NOTE]
