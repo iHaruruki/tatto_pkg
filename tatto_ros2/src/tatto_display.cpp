@@ -16,6 +16,8 @@ public:
     image_side_ = this->get_parameter("image_side").as_int();
 
     img_ = cv::Mat(image_side_, image_side_, CV_8UC3, cv::Scalar(255,255,255));
+    cv::namedWindow("Display Node", cv::WINDOW_NORMAL);   // ← リサイズ可能
+    cv::resizeWindow("Display Node", image_side_, image_side_); // 初期サイズ
 
     sub_vals_ = this->create_subscription<tatto_ros2_msgs::msg::SensorArray>(
       "/tatto/sensor_values", 10, std::bind(&SensorDisplayNode::on_values, this, _1));
