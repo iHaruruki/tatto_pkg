@@ -26,8 +26,8 @@ public:
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
 
-    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("sensor_values_raw", 10);
-    pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("sensor_values", 10);
+    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values_raw", 10);
+    pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values", 10);
 
     bset_.assign(9, 0);
     bset_prev_.assign(9, 0);
@@ -96,7 +96,7 @@ private:
     int byteswaiting = 0;
     ioctl(serial_port_, FIONREAD, &byteswaiting);
 
-    const int min_packet_len = 2 + payload_size_ + 2; // 0xFF 0xFF + 18 + 0xFF 0xFF
+    const int min_packet_len = 2 + payload_size_ + 2; // 0xFF 0xFF + 18(byte) + 0xFF 0xFF
     if (byteswaiting < min_packet_len) return;
 
     std::vector<uint8_t> buf(byteswaiting + 1, 0);

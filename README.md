@@ -65,11 +65,11 @@ ros2 run tatto_ros2 tatto_display_node
 ```
 To see the data being published on a topic / センサの値を見る
 ```bash
-ros2 topic echo /sensor_values
+ros2 topic echo /tatto/sensor_values
 ```
 Export topics in CSV format. / トピックをCSV形式で出力
 ```bash
-ros2 topic echo /sensor_values --csv > output.csv
+ros2 topic echo /tatto/sensor_values --csv > output.csv
 ```
 
 Sensor placement / センサの配置位置  
