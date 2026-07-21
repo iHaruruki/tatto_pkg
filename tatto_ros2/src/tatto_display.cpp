@@ -19,8 +19,6 @@ public:
 
     sub_vals_ = this->create_subscription<tatto_ros2_msgs::msg::SensorArray>(
       "/tatto/sensor_values", 10, std::bind(&SensorDisplayNode::on_values, this, _1));
-
-    //cv::namedWindow("img", cv::WINDOW_AUTOSIZE);
   }
 
   ~SensorDisplayNode() override {
@@ -30,10 +28,10 @@ public:
 private:
   void on_values(const tatto_ros2_msgs::msg::SensorArray::SharedPtr msg) {
 
-    if (msg->data.size() != 9) return;
+    if (msg->data.data.size() != 9) return;
 
     const auto msg_time = rclcpp::Time(msg->header.stamp);
-    const std::vector<uint16_t> &bset_s = msg->data;
+    const std::vector<float> &bset_s = msg->data.data;
 
     const auto current_time = this->get_clock()->now();
     const auto time_lag = (current_time - msg_time).seconds();
@@ -41,16 +39,16 @@ private:
         "stamp: " << msg->header.stamp.sec << "." << msg->header.stamp.nanosec
         << ", frame_id: " << msg->header.frame_id
         << ", lag: " << time_lag << " s");
-    
-    if(time_lag > 0.1) return;  // 100[ms]
 
-    // 全センサが閾値 border より大きいときだけ描画 / Draw only when all sensors are greater than the threshold border
-    const int low = 30;
-    const int high = 2000;
+    if (time_lag > 0.1) return;  // 100 ms
+
+    const float low = 30.0f;
+    const float high = 2000.0f;
     bool above_border = true;
     for (int k = 0; k < 9; ++k) {
-      if (static_cast<int>(bset_s[k]) <= low || static_cast<int>(bset_s[k]) > high){
-      	above_border = false; break;
+      if (bset_s[k] <= low || bset_s[k] > high) {
+        above_border = false;
+        break;
       }
     }
     if (!above_border) return;
@@ -60,28 +58,28 @@ private:
     std::vector<float> s(9, 0.0f);
 
     for (int k = 0; k < 9; ++k) {
-      float mh  = static_cast<float>(bset_s[k]) - fixed_min;
+      float mh = bset_s[k] - fixed_min;
       float denom = std::max(1.0f, scor - fixed_min);
       float normalized = mh / denom;
       s[k] = std::clamp(normalized, 0.0f, 1.0f);
     }
-    // ch7 の特例（index 7）
+
+    // ch7 special (index 7)
     {
-      float mh  = static_cast<float>(bset_s[7]) - fixed_min;
+      float mh = bset_s[7] - fixed_min;
       float denom = std::max(1.0f, 250.0f - fixed_min);
       float normalized = mh / denom;
       s[7] = std::clamp(normalized, 0.0f, 1.0f);
-      s[7] = 0.5;
+      s[7] = 0.5f;
     }
 
-    //ch0 
-    s[0] += 0.2;
-    if(s[0] > 1)s[0] = 1;
+    // ch0 boost
+    s[0] += 0.2f;
+    if (s[0] > 1.0f) s[0] = 1.0f;
 
-    // 描画 / drowing
     img_ = cv::Scalar(255,255,255);
     const float sc = 0.7071f;
-    const int ab   = image_side_ / 2;
+    const int ab = image_side_ / 2;
     const int image_scale = image_side_ / 500;
 
     std::vector<cv::Point> positions = {
@@ -103,29 +101,26 @@ private:
       cv::circle(img_, positions[k], radius, cv::Scalar(255, 0, 0), 2);
     }
 
-    //代表点 / reference point
     float sumw = 0.f, wx = 0.f, wy = 0.f;
     for (int k = 0; k < 9; ++k) {
       wx += s[k] * positions[k].x;
       wy += s[k] * positions[k].y;
       sumw += s[k];
     }
+
     int cx = 250*image_scale, cy = 250*image_scale;
     if (sumw > 0.f) {
       cx = static_cast<int>(wx / sumw);
       cy = static_cast<int>(wy / sumw);
     }
 
-    //cv::circle(img_, {250*image_scale,250*image_scale}, 150*image_scale, cv::Scalar(255,0,0), 3);
-    //cv::circle(img_, {250*image_scale,250*image_scale},  75*image_scale, cv::Scalar(100,100,0), 3);
-    cv::circle(img_, {(cx-ab)*6+ab, (cy-ab)*6+ab}, 10, cv::Scalar(0,0,255), -1);//drow reference point
+    cv::circle(img_, {(cx-ab)*6+ab, (cy-ab)*6+ab}, 10, cv::Scalar(0,0,255), -1);
 
     cv::imshow("Display Node", img_);
     cv::waitKey(1);
   }
 
   rclcpp::Subscription<tatto_ros2_msgs::msg::SensorArray>::SharedPtr sub_vals_;
-
   int image_side_;
   cv::Mat img_;
 };

@@ -31,13 +31,6 @@ ament_target_dependencies(tatto_display_node
 )
 target_link_libraries(tatto_display_node ${OpenCV_LIBS})
 
-add_executable(tatto_touch_detector_node src/tatto_touch_detector.cpp)
-ament_target_dependencies(tatto_touch_detector_node
-  rclcpp
-  std_msgs
-  tatto_ros2_msgs
-)
-
 add_executable(tatto_normalization_node src/tatto_normalization.cpp)
 ament_target_dependencies(tatto_normalization_node
   rclcpp
@@ -49,7 +42,6 @@ ament_target_dependencies(tatto_normalization_node
 install(TARGETS
   tatto_serial_node 
   tatto_display_node
-  tatto_touch_detector_node
   tatto_normalization_node
   DESTINATION lib/${PROJECT_NAME}
 )

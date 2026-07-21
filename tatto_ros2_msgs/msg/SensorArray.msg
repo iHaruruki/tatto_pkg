@@ -1,2 +1,2 @@
 std_msgs/Header header
-uint16[] data
+std_msgs/Float32MultiArray data

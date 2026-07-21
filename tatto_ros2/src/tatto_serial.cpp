@@ -127,12 +127,15 @@ private:
 
     const auto current_time = this->get_clock()->now();
 
-    // Publish: raw
+    // Publish: raw data
     {
       tatto_ros2_msgs::msg::SensorArray msg_raw;
       msg_raw.header.stamp = current_time;
       msg_raw.header.frame_id = "tatto_link";
-      msg_raw.data.assign(bset_.begin(), bset_.end());
+      msg_raw.data.data.clear();
+      msg_raw.data.data.reserve(bset_.size());
+      for (auto v : bset_) msg_raw.data.data.push_back(static_cast<float>(v));
+
       pub_raw_->publish(msg_raw);
     }
 
@@ -178,7 +181,10 @@ private:
       tatto_ros2_msgs::msg::SensorArray msg_reordered;
       msg_reordered.header.stamp = current_time;
       msg_reordered.header.frame_id = "tatto_link";
-      msg_reordered.data.assign(bset_s.begin(), bset_s.end());
+      msg_reordered.data.data.clear();
+      msg_reordered.data.data.reserve(bset_s.size());
+      for (auto v : bset_s) msg_reordered.data.data.push_back(static_cast<float>(v));
+      
       pub_reordered_->publish(msg_reordered);
     }
 
