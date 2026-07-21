@@ -46,6 +46,7 @@ Check USB conection
 ```bash
 ls /dev/ttyUSB*
 ```
+Output results / 出力結果
 ```bash
 /dev/ttyUSB0
 ```
@@ -56,11 +57,11 @@ sudo chmod 666 /dev/ttyUSB0
 
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 run tatto_pkg tatto_serial_node --ros-args -p port:=/dev/ttyUSB0
+ros2 run tatto_ros2 tatto_serial_node --ros-args -p port:=/dev/ttyUSB0
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash
-ros2 run tatto_pkg tatto_display_node
+ros2 run tatto_ros2 tatto_display_node
 ```
 To see the data being published on a topic / センサの値を見る
 ```bash
