@@ -38,9 +38,17 @@ ament_target_dependencies(tatto_normalization_node
   tatto_ros2_msgs
 )
 
+add_executable(tatto2_serial_node src/tatto2_serial.cpp)
+ament_target_dependencies(tatto2_serial_node 
+  rclcpp
+  std_msgs
+  tatto_ros2_msgs
+)
+
 
 install(TARGETS
   tatto_serial_node 
+  tatto2_serial_node
   tatto_display_node
   tatto_normalization_node
   DESTINATION lib/${PROJECT_NAME}
