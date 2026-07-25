@@ -124,7 +124,7 @@ private:
       uint16_t hi = buf[head_idx + 2*i];
       uint16_t lo = buf[head_idx + 2*i + 1];
       bset_[i] = static_cast<uint16_t>((hi << 8) | lo);
-      RCLCPP_INFO(this->get_logger(), "%d", static_cast<int>(bset_[i]));
+      RCLCPP_DEBUG(this->get_logger(), "%d", static_cast<int>(bset_[i]));
     }
 
     const auto current_time = this->get_clock()->now();
