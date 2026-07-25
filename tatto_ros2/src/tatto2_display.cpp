@@ -1,73 +1,74 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
-#include <geometry_msgs/msg/point.hpp>
-#include <std_msgs/msg/color_rgba.hpp>
-
 #include <tatto_ros2_msgs/msg/sensor_array.hpp>
 
-class SensorArrayToMarkerArrayNode : public rclcpp::Node
+class SensorArrayToPhotosensorMarkersNode : public rclcpp::Node
 {
 public:
-  SensorArrayToMarkerArrayNode()
-  : Node("sensor_array_to_marker_array_node")
+  SensorArrayToPhotosensorMarkersNode()
+  : Node("sensor_array_to_photosensor_markers_node")
   {
     input_topic_  = declare_parameter<std::string>("input_topic", "/tatto/sensor_values_raw");
-    marker_topic_ = declare_parameter<std::string>("marker_topic", "/tatto/sensor_markers_array");
-    fallback_frame_ = declare_parameter<std::string>("fallback_frame", "tatto_link");
+    output_topic_ = declare_parameter<std::string>("output_topic", "/tatto/markers/photosensor");
 
+    // 値→緑強度の正規化レンジ
     vmin_ = declare_parameter<double>("vmin", 150.0);
     vmax_ = declare_parameter<double>("vmax", 210.0);
 
-    sx_ = declare_parameter<double>("scale_x", 0.01);
-    sy_ = declare_parameter<double>("scale_y", 0.01);
+    // マーカサイズ
+    sx_ = declare_parameter<double>("scale_x", 0.003);
+    sy_ = declare_parameter<double>("scale_y", 0.003);
     sz_ = declare_parameter<double>("scale_z", 0.002);
 
-    // 例: ["tatto_sensor_0","tatto_sensor_1",...]
-    sensor_frames_ = declare_parameter<std::vector<std::string>>(
-      "sensor_frames", std::vector<std::string>{});
+    // photosensor_N の開始インデックス
+    sensor_index_offset_ = declare_parameter<int>("sensor_index_offset", 0);
 
-    pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(marker_topic_, 10);
     sub_ = create_subscription<tatto_ros2_msgs::msg::SensorArray>(
-      input_topic_, 10,
-      std::bind(&SensorArrayToMarkerArrayNode::on_msg, this, std::placeholders::_1));
+      input_topic_, rclcpp::SensorDataQoS(),
+      std::bind(&SensorArrayToPhotosensorMarkersNode::onMsg, this, std::placeholders::_1));
+
+    pub_ = create_publisher<visualization_msgs::msg::MarkerArray>(output_topic_, 10);
+
+    RCLCPP_INFO(get_logger(), "sub: %s", input_topic_.c_str());
+    RCLCPP_INFO(get_logger(), "pub: %s", output_topic_.c_str());
   }
 
 private:
-  double norm(double v) const
+  double normalize(double v) const
   {
     if (vmax_ <= vmin_) return 0.0;
     return std::clamp((v - vmin_) / (vmax_ - vmin_), 0.0, 1.0);
   }
 
-  void on_msg(const tatto_ros2_msgs::msg::SensorArray::SharedPtr msg)
+  void onMsg(const tatto_ros2_msgs::msg::SensorArray::SharedPtr msg)
   {
     const auto & values = msg->data.data;
     visualization_msgs::msg::MarkerArray arr;
     const auto stamp = now();
 
+    {
+      visualization_msgs::msg::Marker del;
+      del.action = visualization_msgs::msg::Marker::DELETEALL;
+      arr.markers.push_back(del);
+    }
+
     for (size_t i = 0; i < values.size(); ++i) {
       visualization_msgs::msg::Marker m;
       m.header.stamp = stamp;
+      m.header.frame_id = "photosensor_" + std::to_string(sensor_index_offset_ + static_cast<int>(i));
 
-      if (i < sensor_frames_.size() && !sensor_frames_[i].empty()) {
-        m.header.frame_id = sensor_frames_[i];          // 各マーカ個別frame
-      } else if (!msg->header.frame_id.empty()) {
-        m.header.frame_id = msg->header.frame_id;
-      } else {
-        m.header.frame_id = fallback_frame_;
-      }
-
-      m.ns = "tatto_sensor_each_frame";
+      m.ns = "photosensor_values";
       m.id = static_cast<int>(i);
       m.type = visualization_msgs::msg::Marker::CUBE;
       m.action = visualization_msgs::msg::Marker::ADD;
 
-      // 各frame原点に表示（=そのセンサ座標系に追従）
+      // 各photosensor frame原点に表示
       m.pose.position.x = 0.0;
       m.pose.position.y = 0.0;
       m.pose.position.z = 0.0;
@@ -77,11 +78,14 @@ private:
       m.scale.y = sy_;
       m.scale.z = sz_;
 
-      const float g = static_cast<float>(norm(values[i]));
+      const float g = static_cast<float>(normalize(values[i]));
       m.color.r = 0.0f;
-      m.color.g = g;
+      m.color.g = g;   // 緑の明るさ
       m.color.b = 0.0f;
       m.color.a = 1.0f;
+
+      // 少しだけ寿命を持たせる（更新が止まったら消える）
+      m.lifetime = rclcpp::Duration::from_seconds(0.3);
 
       arr.markers.push_back(std::move(m));
     }
@@ -92,15 +96,17 @@ private:
   rclcpp::Subscription<tatto_ros2_msgs::msg::SensorArray>::SharedPtr sub_;
   rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr pub_;
 
-  std::string input_topic_, marker_topic_, fallback_frame_;
-  double vmin_, vmax_, sx_, sy_, sz_;
-  std::vector<std::string> sensor_frames_;
+  std::string input_topic_;
+  std::string output_topic_;
+  double vmin_, vmax_;
+  double sx_, sy_, sz_;
+  int sensor_index_offset_;
 };
 
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<SensorArrayToMarkerArrayNode>());
+  rclcpp::spin(std::make_shared<SensorArrayToPhotosensorMarkersNode>());
   rclcpp::shutdown();
   return 0;
 }
