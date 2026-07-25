@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#define number_of_sensor 33
+#define number_of_sensor 32
 
 using namespace std::chrono_literals;
 
