@@ -10,3 +10,216 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
+#define number_of_sensor 33
+
+using namespace std::chrono_literals;
+
+class SensorReaderNode : public rclcpp::Node {
+public:
+  SensorReaderNode()
+  : Node("sensor_reader_node"),
+    serial_port_(-1),
+    payload_size_(number_of_sensor * 2),
+    calibrated_(false)
+  {
+    this->declare_parameter<std::string>("port", "/dev/ttyACM0");
+    this->declare_parameter<int>("baud", 115200);
+    port_ = this->get_parameter("port").as_string();
+    baud_ = this->get_parameter("baud").as_int();
+
+    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values_raw", number_of_sensor + 1);
+    //pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values", number_of_sensor + 1);
+
+    bset_.assign(number_of_sensor, 0);
+    bset_prev_.assign(number_of_sensor, 0);
+    minv_.assign(number_of_sensor, 0);
+
+    if (!init_serial()) {
+      RCLCPP_ERROR(get_logger(), "Serial init failed. Node will run but publish nothing.");
+    }
+
+    timer_ = this->create_wall_timer(30ms, std::bind(&SensorReaderNode::on_timer, this));
+  }
+
+  ~SensorReaderNode() override {
+    if (serial_port_ >= 0) close(serial_port_);
+  }
+
+private:
+  bool init_serial() {
+    serial_port_ = open(port_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (serial_port_ < 0) {
+      RCLCPP_ERROR(get_logger(), "open(%s) failed: %s", port_.c_str(), strerror(errno));
+      return false;
+    }
+
+    termios tty{};
+    if (tcgetattr(serial_port_, &tty) != 0) {
+      RCLCPP_ERROR(get_logger(), "tcgetattr: %s", strerror(errno));
+      return false;
+    }
+
+    // ボーレート
+    speed_t spd = B115200;
+    if (baud_ == 9600) spd = B9600;
+    else if (baud_ == 19200) spd = B19200;
+    else if (baud_ == 57600) spd = B57600;
+    else spd = B115200;
+    cfsetospeed(&tty, spd);
+    cfsetispeed(&tty, spd);
+
+    tty.c_cflag &= ~PARENB;
+    tty.c_cflag &= ~CSTOPB;
+    tty.c_cflag &= ~CSIZE;
+    tty.c_cflag |= CS8;
+    tty.c_cflag &= ~CRTSCTS;
+    tty.c_cflag |= CREAD | CLOCAL;
+
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+    tty.c_iflag &= ~(IXON | IXOFF | IXANY | IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL);
+    tty.c_oflag &= ~(OPOST | ONLCR);
+
+    tty.c_cc[VTIME] = 1;  // 0.1s
+    tty.c_cc[VMIN]  = 0;
+
+    if (tcsetattr(serial_port_, TCSANOW, &tty) != 0) {
+      RCLCPP_ERROR(get_logger(), "tcsetattr: %s", strerror(errno));
+      return false;
+    }
+
+    RCLCPP_INFO(get_logger(), "Serial opened: %s @ %d", port_.c_str(), baud_);
+    return true;
+  }
+
+  void on_timer() {
+    if (serial_port_ < 0) return;
+
+    int byteswaiting = 0;
+    ioctl(serial_port_, FIONREAD, &byteswaiting);
+
+    const int min_packet_len = 2 + payload_size_ + 2; // 0xFF 0xFF + 18(byte) + 0xFF 0xFF
+    if (byteswaiting < min_packet_len) return;
+
+    std::vector<uint8_t> buf(byteswaiting + 1, 0);
+    ssize_t r = read(serial_port_, buf.data(), buf.size());
+    if (r <= 0) return;
+
+    int head_idx = -1;
+    for (size_t k = 0; k + min_packet_len <= buf.size(); ++k) {
+      if (buf[k] == 0xAA && buf[k+1] == 0x55) {
+        size_t tail_pos = k + 2 + payload_size_;
+        if (tail_pos + 1 < buf.size() && buf[tail_pos] == 0xAA && buf[tail_pos+1] == 0x55) {
+          head_idx = static_cast<int>(k + 2);
+          break;
+        }
+      }
+    }
+    if (head_idx < 0) return;
+
+    // シフト
+    for (int i = 0; i < number_of_sensor; ++i) bset_prev_[i] = bset_[i];
+
+    // デコード（Big-endian）
+    for (int i = 0; i < number_of_sensor; ++i) {
+      uint16_t hi = buf[head_idx + 2*i];
+      uint16_t lo = buf[head_idx + 2*i + 1];
+      bset_[i] = static_cast<uint16_t>((hi << 8) | lo);
+      RCLCPP_INFO(this->get_logger(), "%d", static_cast<int>(bset_[i]));
+    }
+
+    const auto current_time = this->get_clock()->now();
+
+    // Publish: raw data
+    {
+      tatto_ros2_msgs::msg::SensorArray msg_raw;
+      msg_raw.header.stamp = current_time;
+      msg_raw.header.frame_id = "tatto_link";
+
+      msg_raw.data.data.clear();
+      msg_raw.data.data.reserve(bset_.size());
+
+      //std_msgs/Header header
+      //std_msgs/Float32MultiArray data
+      //#include <tatto_ros2_msgs/msg/sensor_array.hpp>
+
+      for (auto v : bset_) msg_raw.data.data.push_back(static_cast<float>(v));
+
+      pub_raw_->publish(msg_raw);
+    }
+
+    // 初回キャリブレーション
+    if (!calibrated_) {
+      bool all_set = true;
+      for (int i = 0; i < number_of_sensor; ++i) {
+        if (minv_[i] == 0) {
+          if (bset_[i] != 0 && (int)bset_[i] - (int)bset_prev_[i] >= 0) {
+            minv_[i] = bset_[i];
+          } else {
+            all_set = false;
+          }
+        }
+      }
+      if (all_set) {
+        calibrated_ = true;
+        RCLCPP_INFO(get_logger(), "Calibration complete for sensors.");
+      }
+    }
+    
+    for(int i=0; i < 9; i++){
+    	if(bset_[i] > 2000) break;
+    }
+/*
+    // 並べ替え
+    // センサのレイアウトに合わせて並べ替え
+    //前：bset_ = [A0, A1, A2, A3, A4, A5, A6, A7, A8]
+    //並べ替え後：bset_s = [A5, A2, A7, A6, A3, A8, A0, A4, A1]
+    std::vector<uint16_t> bset_s(9);
+    bset_s[0] = bset_[5];
+    bset_s[1] = bset_[2];
+    bset_s[2] = bset_[7];
+    bset_s[3] = bset_[6];
+    bset_s[4] = bset_[3];
+    bset_s[5] = bset_[8];
+    bset_s[6] = bset_[0];
+    bset_s[7] = bset_[4];
+    bset_s[8] = bset_[1];
+
+    // Publish: 並び替え後
+    {
+      tatto_ros2_msgs::msg::SensorArray msg_reordered;
+      msg_reordered.header.stamp = current_time;
+      msg_reordered.header.frame_id = "tatto_link";
+      msg_reordered.data.data.clear();
+      msg_reordered.data.data.reserve(bset_s.size());
+      for (auto v : bset_s) msg_reordered.data.data.push_back(static_cast<float>(v));
+      
+      pub_reordered_->publish(msg_reordered);
+    }
+*/
+  }
+
+  // Params
+  std::string port_;
+  int baud_;
+
+  // Serial
+  int serial_port_;
+  const int payload_size_;
+
+  // State
+  std::vector<uint16_t> bset_, bset_prev_;
+  std::vector<uint16_t> minv_;
+  bool calibrated_;
+  rclcpp::TimerBase::SharedPtr timer_;
+
+  // Publishers
+  rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_raw_;
+  //rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_reordered_;
+};
+
+int main(int argc, char** argv) {
+  rclcpp::init(argc, argv);
+  rclcpp::spin(std::make_shared<SensorReaderNode>());
+  rclcpp::shutdown();
+  return 0;
+}
