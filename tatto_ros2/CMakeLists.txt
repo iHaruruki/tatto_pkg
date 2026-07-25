@@ -11,6 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
+find_package(visualization_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(tatto_ros2_msgs)
 
@@ -45,11 +46,20 @@ ament_target_dependencies(tatto2_serial_node
   tatto_ros2_msgs
 )
 
+add_executable(tatto2_display_node src/tatto2_display.cpp)
+ament_target_dependencies(tatto2_display_node
+  rclcpp
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+  tatto_ros2_msgs
+)
 
 install(TARGETS
   tatto_serial_node 
   tatto2_serial_node
   tatto_display_node
+  tatto2_display_node
   tatto_normalization_node
   DESTINATION lib/${PROJECT_NAME}
 )
