@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#define number_of_sensor 32
+#define number_of_sensor 33
 
 using namespace std::chrono_literals;
 
@@ -169,7 +169,7 @@ private:
     //前：bset_ = [A0, A1, A2, A3, A4, A5, A6, A7, A8]
     //並べ替え後：bset_s = [A5, A2, A7, A6, A3, A8, A0, A4, A1]
     std::vector<uint16_t> bset_s(9);
-    bset_s[0] = bset_[5];
+    bset_s[0] = bset_[0];
     bset_s[1] = bset_[2];
     bset_s[2] = bset_[7];
     bset_s[3] = bset_[6];
