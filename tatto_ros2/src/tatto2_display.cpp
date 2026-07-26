@@ -65,7 +65,8 @@ private:
 
       m.ns = "photosensor_values";
       m.id = static_cast<int>(i);
-      m.type = visualization_msgs::msg::Marker::CUBE;
+      // m.type = visualization_msgs::msg::Marker::CUBE;
+      m.type = visualization_msgs::msg::Marker::SPHERE;
       m.action = visualization_msgs::msg::Marker::ADD;
 
       // 各photosensor frame原点に表示
@@ -82,7 +83,7 @@ private:
       m.color.r = 0.0f;
       m.color.g = g;   // 緑の明るさ
       m.color.b = 0.0f;
-      m.color.a = 1.0f;
+      m.color.a = 0.4f;
 
       // 少しだけ寿命を持たせる（更新が止まったら消える）
       m.lifetime = rclcpp::Duration::from_seconds(0.3);
