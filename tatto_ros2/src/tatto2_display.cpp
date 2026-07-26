@@ -23,9 +23,9 @@ public:
     vmax_ = declare_parameter<double>("vmax", 350.0);
 
     // マーカサイズ
-    sx_ = declare_parameter<double>("scale_x", 0.003);
-    sy_ = declare_parameter<double>("scale_y", 0.003);
-    sz_ = declare_parameter<double>("scale_z", 0.002);
+    sx_ = declare_parameter<double>("scale_x", 0.004);
+    sy_ = declare_parameter<double>("scale_y", 0.004);
+    sz_ = declare_parameter<double>("scale_z", 0.004);
 
     // photosensor_N の開始インデックス
     sensor_index_offset_ = declare_parameter<int>("sensor_index_offset", 0);
@@ -53,11 +53,11 @@ private:
     visualization_msgs::msg::MarkerArray arr;
     const auto stamp = now();
 
-    {
-      visualization_msgs::msg::Marker del;
-      del.action = visualization_msgs::msg::Marker::DELETEALL;
-      arr.markers.push_back(del);
-    }
+    // {
+    //   visualization_msgs::msg::Marker del;
+    //   del.action = visualization_msgs::msg::Marker::DELETEALL;
+    //   arr.markers.push_back(del);
+    // }
 
     for (size_t i = 0; i < values.size(); ++i) {
       visualization_msgs::msg::Marker m;
@@ -80,11 +80,26 @@ private:
       m.scale.y = sy_;
       m.scale.z = sz_;
 
-      const float g = static_cast<float>(normalize(values[i]));
-      m.color.r = 0.0f;
-      m.color.g = g;   // 緑の明るさ
-      m.color.b = 0.0f;
-      m.color.a = 0.9f;
+      // HSV
+      float h = 120.0f;   // 0～360°
+      float s = static_cast<float>(normalize(values[i]));
+      float v = 1.0f;
+      // const float g = static_cast<float>(normalize(values[i]));
+
+      cv::Mat hsv(1, 1, CV_8UC3);
+      hsv.at<cv::Vec3b>(0,0) = cv::Vec3b(
+      static_cast<uchar>(h / 2),
+      static_cast<uchar>(s * 255),
+      static_cast<uchar>(v * 255));
+
+      cv::Mat rgb;
+      cv::cvtColor(hsv, rgb, cv::COLOR_HSV2RGB);
+      cv::Vec3b c = rgb.at<cv::Vec3b>(0,0);
+
+      m.color.r = c[0] / 255.0f;
+      m.color.g = c[1] / 255.0f;
+      m.color.b = c[2] / 255.0f;
+      m.color.a = 1.0f;
 
       // 少しだけ寿命を持たせる（更新が止まったら消える）
       m.lifetime = rclcpp::Duration::from_seconds(0.3);
