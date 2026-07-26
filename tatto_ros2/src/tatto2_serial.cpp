@@ -168,16 +168,16 @@ private:
     // センサのレイアウトに合わせて並べ替え
     //前：bset_ = [A0, A1, A2, A3, A4, A5, A6, A7, A8]
     //並べ替え後：bset_s = [A5, A2, A7, A6, A3, A8, A0, A4, A1]
-    std::vector<uint16_t> bset_s(9);
-    bset_s[0] = bset_[0];
-    bset_s[1] = bset_[2];
-    bset_s[2] = bset_[7];
-    bset_s[3] = bset_[6];
-    bset_s[4] = bset_[3];
-    bset_s[5] = bset_[8];
-    bset_s[6] = bset_[0];
-    bset_s[7] = bset_[4];
-    bset_s[8] = bset_[1];
+    std::vector<uint16_t> bset_s(33);
+    // bset_s[0] = bset_[0];
+    // bset_s[1] = bset_[1];
+    // bset_s[2] = bset_[2];
+    // bset_s[3] = bset_[3];
+    // bset_s[4] = bset_[4];
+    // bset_s[5] = bset_[8];
+    // bset_s[6] = bset_[0];
+    // bset_s[7] = bset_[4];
+    // bset_s[8] = bset_[1];
     // bset_s[9] = bset_[];
     // bset_s[10] = bset_[];
     // bset_s[11] = bset_[];
@@ -202,6 +202,8 @@ private:
     // bset_s[30] = bset_[];
     // bset_s[31] = bset_[];
     // bset_s[32] = bset_[];
+
+    bset_s = bset_;
 
     // Publish: 並び替え後
     {
