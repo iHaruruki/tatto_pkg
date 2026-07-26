@@ -21,6 +21,8 @@ public:
     // 値→緑強度の正規化レンジ
     vmin_ = declare_parameter<double>("vmin", 160.0);
     vmax_ = declare_parameter<double>("vmax", 350.0);
+    // vmin_ = declare_parameter<double>("vmin", 250.0);
+    // vmax_ = declare_parameter<double>("vmax", 320.0);
 
     // マーカサイズ
     sx_ = declare_parameter<double>("scale_x", 0.004);
