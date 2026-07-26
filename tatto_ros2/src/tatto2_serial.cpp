@@ -27,8 +27,8 @@ public:
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
 
-    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values_raw", number_of_sensor + 1);
-    //pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values", number_of_sensor + 1);
+    pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values_raw", 10);
+    pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values", 10);
 
     bset_.assign(number_of_sensor, 0);
     bset_prev_.assign(number_of_sensor, 0);
@@ -137,11 +137,6 @@ private:
 
       msg_raw.data.data.clear();
       msg_raw.data.data.reserve(bset_.size());
-
-      //std_msgs/Header header
-      //std_msgs/Float32MultiArray data
-      //#include <tatto_ros2_msgs/msg/sensor_array.hpp>
-
       for (auto v : bset_) msg_raw.data.data.push_back(static_cast<float>(v));
 
       pub_raw_->publish(msg_raw);
@@ -168,7 +163,7 @@ private:
     for(int i=0; i < 9; i++){
     	if(bset_[i] > 2000) break;
     }
-/*
+
     // 並べ替え
     // センサのレイアウトに合わせて並べ替え
     //前：bset_ = [A0, A1, A2, A3, A4, A5, A6, A7, A8]
@@ -183,6 +178,30 @@ private:
     bset_s[6] = bset_[0];
     bset_s[7] = bset_[4];
     bset_s[8] = bset_[1];
+    // bset_s[9] = bset_[];
+    // bset_s[10] = bset_[];
+    // bset_s[11] = bset_[];
+    // bset_s[12] = bset_[];
+    // bset_s[13] = bset_[];
+    // bset_s[14] = bset_[];
+    // bset_s[15] = bset_[];
+    // bset_s[16] = bset_[];
+    // bset_s[17] = bset_[];
+    // bset_s[18] = bset_[];
+    // bset_s[19] = bset_[];
+    // bset_s[20] = bset_[];
+    // bset_s[21] = bset_[];
+    // bset_s[22] = bset_[];
+    // bset_s[23] = bset_[];
+    // bset_s[24] = bset_[];
+    // bset_s[25] = bset_[];
+    // bset_s[26] = bset_[];
+    // bset_s[27] = bset_[];
+    // bset_s[28] = bset_[];
+    // bset_s[29] = bset_[];
+    // bset_s[30] = bset_[];
+    // bset_s[31] = bset_[];
+    // bset_s[32] = bset_[];
 
     // Publish: 並び替え後
     {
@@ -195,7 +214,7 @@ private:
       
       pub_reordered_->publish(msg_reordered);
     }
-*/
+
   }
 
   // Params
@@ -214,7 +233,7 @@ private:
 
   // Publishers
   rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_raw_;
-  //rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_reordered_;
+  rclcpp::Publisher<tatto_ros2_msgs::msg::SensorArray>::SharedPtr pub_reordered_;
 };
 
 int main(int argc, char** argv) {
