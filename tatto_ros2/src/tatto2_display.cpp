@@ -25,7 +25,7 @@ public:
     // マーカサイズ
     sx_ = declare_parameter<double>("scale_x", 0.004);
     sy_ = declare_parameter<double>("scale_y", 0.004);
-    sz_ = declare_parameter<double>("scale_z", 0.004);
+    sz_ = declare_parameter<double>("scale_z", 0.003);
 
     // photosensor_N の開始インデックス
     sensor_index_offset_ = declare_parameter<int>("sensor_index_offset", 0);
