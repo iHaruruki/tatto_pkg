@@ -15,7 +15,7 @@ public:
   SensorArrayToPhotosensorMarkersNode()
   : Node("sensor_array_to_photosensor_markers_node")
   {
-    input_topic_  = declare_parameter<std::string>("input_topic", "/tatto/sensor_values_raw");
+    input_topic_  = declare_parameter<std::string>("input_topic", "/tatto/sensor_values");
     output_topic_ = declare_parameter<std::string>("output_topic", "/tatto/markers/photosensor");
 
     // 値→緑強度の正規化レンジ
