@@ -54,6 +54,7 @@ ament_target_dependencies(tatto2_display_node
   visualization_msgs
   tatto_ros2_msgs
 )
+target_link_libraries(tatto2_display_node ${OpenCV_LIBS})
 
 install(TARGETS
   tatto_serial_node 

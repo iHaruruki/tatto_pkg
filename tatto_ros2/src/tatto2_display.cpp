@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <rclcpp/rclcpp.hpp>
+#include <opencv2/opencv.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <tatto_ros2_msgs/msg/sensor_array.hpp>
@@ -18,8 +19,8 @@ public:
     output_topic_ = declare_parameter<std::string>("output_topic", "/tatto/markers/photosensor");
 
     // 値→緑強度の正規化レンジ
-    vmin_ = declare_parameter<double>("vmin", 150.0);
-    vmax_ = declare_parameter<double>("vmax", 210.0);
+    vmin_ = declare_parameter<double>("vmin", 160.0);
+    vmax_ = declare_parameter<double>("vmax", 350.0);
 
     // マーカサイズ
     sx_ = declare_parameter<double>("scale_x", 0.003);
@@ -83,7 +84,7 @@ private:
       m.color.r = 0.0f;
       m.color.g = g;   // 緑の明るさ
       m.color.b = 0.0f;
-      m.color.a = 0.4f;
+      m.color.a = 0.9f;
 
       // 少しだけ寿命を持たせる（更新が止まったら消える）
       m.lifetime = rclcpp::Duration::from_seconds(0.3);
