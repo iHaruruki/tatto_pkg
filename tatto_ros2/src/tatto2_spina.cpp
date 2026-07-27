@@ -117,7 +117,7 @@ private:
     std::string frame = "photosensor_" + std::to_string(index);
 
     try {
-      auto tf = tf_buffer_->lookupTransform("module4_upper_link", frame, tf2::TimePointZero);
+      auto tf = tf_buffer_->lookupTransform("tatto_link", frame, tf2::TimePointZero);
 
       spina_angle(
         tf.transform.translation.x,
