@@ -55,21 +55,20 @@ private:
     return v;
   }
 
-  // "A0p-090" / "A0r045" 形式（正値は符号なし、3桁ゼロ埋め）
   std::string format_cmd(const std::string &prefix, int value) const
   {
     value = clamp_deg(value);
 
     std::ostringstream ss;
-    ss << prefix;
-    if (value < 0) {
-      ss << '-';
-    }
-    ss << std::setw(3) << std::setfill('0') << std::abs(value);
+    ss << prefix
+       << (value < 0 ? '-' : '+')
+       << std::setw(3)
+       << std::setfill('0')
+       << std::abs(value);
     return ss.str();
   }
 
-  void publish_value(const char *prefix, int value)
+  void publish_value(const std::string &prefix, int value)
   {
     std_msgs::msg::String out;
     out.data = format_cmd(prefix, value);
