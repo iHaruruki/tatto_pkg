@@ -197,7 +197,7 @@ private:
     bset_s[22] = bset_[21];
     bset_s[23] = bset_[20];
     bset_s[24] = bset_[19];
-    bset_s[25] = bset_[25];//
+    bset_s[25] = bset_[25];
     bset_s[26] = bset_[32];
     bset_s[27] = bset_[31];
     bset_s[28] = bset_[30];
