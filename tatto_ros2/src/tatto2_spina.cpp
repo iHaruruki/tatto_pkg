@@ -36,16 +36,38 @@ public:
   }
 
 private:
+  int apply_rate_limit(int target, int last) 
+  {
+    int diff = target - last;
+    if (diff >  max_step_deg_) diff =  max_step_deg_;
+    if (diff < -max_step_deg_) diff = -max_step_deg_;
+    return last + diff;
+  }
+
   void spina_angle(double x, double y, double z)
   {
-    double pitch = std::atan2(x, std::sqrt(y * y + z * z));
-    double yaw   = std::atan2(y, std::sqrt(x * x + z * z));
+    double pitch = std::atan2(x, z);
+    double yaw   = std::atan2(y, z);
 
     int pitch_deg = static_cast<int>(pitch * 180.0 / M_PI);
     int yaw_deg   = static_cast<int>(yaw   * 180.0 / M_PI);
 
-    publish_value("A0p", pitch_deg * 2);
-    publish_value("A0r", yaw_deg * 2);
+    int pitch_tgt = static_cast<int>(kp_ * pitch_deg);
+    int yaw_tgt   = static_cast<int>(kp_ * yaw_deg);
+
+    // デッドバンド
+    if (std::abs(pitch_tgt) < deadband_deg_) pitch_tgt = 0;
+    if (std::abs(yaw_tgt)   < deadband_deg_) yaw_tgt   = 0;
+
+    // レート制限
+    int pitch_cmd = apply_rate_limit(pitch_tgt, last_pitch_cmd_);
+    int yaw_cmd   = apply_rate_limit(yaw_tgt,   last_yaw_cmd_);
+
+    publish_value("A0p", pitch_cmd);
+    publish_value("A0r", yaw_cmd);
+
+    last_pitch_cmd_ = pitch_cmd;
+    last_yaw_cmd_   = yaw_cmd;
   }
 
   int clamp_deg(int v) const
@@ -96,11 +118,21 @@ private:
 
       RCLCPP_INFO(
         get_logger(),
-        "max sensor: %zu (%.1f)\nposition = (%.3f, %.3f, %.3f)",
+        "max sensor: %zu (%.1f) position = (%.3f, %.3f, %.3f)",
         index, value,
         tf.transform.translation.x,
         tf.transform.translation.y,
         tf.transform.translation.z);
+
+      auto tf_tatto = tf_buffer_->lookupTransform("tatto_link", frame, tf2::TimePointZero);
+
+      RCLCPP_INFO(
+        get_logger(),
+        "tatto: %zu (%.1f) position = (%.3f, %.3f, %.3f)",
+        index, value,
+        tf_tatto.transform.translation.x,
+        tf_tatto.transform.translation.y,
+        tf_tatto.transform.translation.z);
 
     } catch (const tf2::TransformException &ex) {
       RCLCPP_WARN(get_logger(), "%s", ex.what());
@@ -114,6 +146,11 @@ private:
 
   int min_deg_ = -90;
   int max_deg_ = 90;
+  double kp_ = 1.2;         // まずは小さく
+  int deadband_deg_ = 3;
+  int max_step_deg_ = 4;
+  int last_pitch_cmd_ = 0;
+  int last_yaw_cmd_ = 0;
 };
 
 int main(int argc, char **argv)
