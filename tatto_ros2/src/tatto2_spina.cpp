@@ -46,28 +46,36 @@ private:
 
   void spina_angle(double x, double y, double z)
   {
-    double pitch = std::atan2(x, z);
-    double yaw   = std::atan2(y, z);
+    const double eps = 1e-6;
+    const double norm = std::sqrt(x*x + y*y + z*z);
+    if (norm < eps) return;
 
-    int pitch_deg = static_cast<int>(pitch * 180.0 / M_PI);
-    int yaw_deg   = static_cast<int>(yaw   * 180.0 / M_PI);
+    // unit vector
+    const double nx = x / norm;
+    const double ny = y / norm;
+    const double nz = z / norm;
 
-    int pitch_tgt = static_cast<int>(kp_ * pitch_deg);
-    int yaw_tgt   = static_cast<int>(kp_ * yaw_deg);
+    // pitch / roll
+    double roll  = std::atan2(ny, nz);
+    double pitch = std::atan2(nx, std::sqrt(ny*ny + nz*nz));
 
-    // デッドバンド
+    int pitch_deg = static_cast<int>(std::round(pitch * 180.0 / M_PI));
+    int roll_deg  = static_cast<int>(std::round(roll  * 180.0 / M_PI));
+
+    int pitch_tgt = static_cast<int>(std::round(kp_ * pitch_deg));
+    int roll_tgt  = static_cast<int>(std::round(kp_ * roll_deg));
+
     if (std::abs(pitch_tgt) < deadband_deg_) pitch_tgt = 0;
-    if (std::abs(yaw_tgt)   < deadband_deg_) yaw_tgt   = 0;
+    if (std::abs(roll_tgt)  < deadband_deg_) roll_tgt  = 0;
 
-    // レート制限
     int pitch_cmd = apply_rate_limit(pitch_tgt, last_pitch_cmd_);
-    int yaw_cmd   = apply_rate_limit(yaw_tgt,   last_yaw_cmd_);
+    int roll_cmd  = apply_rate_limit(roll_tgt,  last_roll_cmd_);
 
     publish_value("A0p", pitch_cmd);
-    publish_value("A0r", yaw_cmd);
+    publish_value("A0r", roll_cmd);
 
     last_pitch_cmd_ = pitch_cmd;
-    last_yaw_cmd_   = yaw_cmd;
+    last_roll_cmd_  = roll_cmd;
   }
 
   int clamp_deg(int v) const
@@ -146,11 +154,11 @@ private:
 
   int min_deg_ = -90;
   int max_deg_ = 90;
-  double kp_ = 1.2;         // まずは小さく
+  double kp_ = 0.8;
   int deadband_deg_ = 3;
   int max_step_deg_ = 4;
   int last_pitch_cmd_ = 0;
-  int last_yaw_cmd_ = 0;
+  int last_roll_cmd_ = 0;
 };
 
 int main(int argc, char **argv)
