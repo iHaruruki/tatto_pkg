@@ -14,6 +14,7 @@ find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(tatto_ros2_msgs)
+find_package(tf2_ros REQUIRED)
 
 add_executable(tatto_serial_node src/tatto_serial.cpp)
 ament_target_dependencies(tatto_serial_node
@@ -56,12 +57,24 @@ ament_target_dependencies(tatto2_display_node
 )
 target_link_libraries(tatto2_display_node ${OpenCV_LIBS})
 
+add_executable(tatto2_spina_node src/tatto2_spina.cpp)
+ament_target_dependencies(tatto2_spina_node
+  rclcpp
+  std_msgs
+  geometry_msgs
+  visualization_msgs
+  tatto_ros2_msgs
+  tf2_ros
+)
+target_link_libraries(tatto2_spina_node ${OpenCV_LIBS})
+
 install(TARGETS
   tatto_serial_node 
   tatto2_serial_node
   tatto_display_node
   tatto2_display_node
   tatto_normalization_node
+  tatto2_spina_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
