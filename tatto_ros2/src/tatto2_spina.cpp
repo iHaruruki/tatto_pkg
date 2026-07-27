@@ -44,8 +44,8 @@ private:
     int pitch_deg = static_cast<int>(pitch * 180.0 / M_PI);
     int yaw_deg   = static_cast<int>(yaw   * 180.0 / M_PI);
 
-    publish_value("A0p", pitch_deg);
-    publish_value("A0r", yaw_deg);
+    publish_value("A0p", pitch_deg * 2);
+    publish_value("A0r", yaw_deg * 2);
   }
 
   int clamp_deg(int v) const
