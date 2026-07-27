@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 
-#define number_of_sensor 33
+// #define number_of_sensor 33
 
 using namespace std::chrono_literals;
 
@@ -19,20 +19,23 @@ public:
   SensorReaderNode()
   : Node("sensor_reader_node"),
     serial_port_(-1),
-    payload_size_(number_of_sensor * 2),
     calibrated_(false)
   {
     this->declare_parameter<std::string>("port", "/dev/ttyACM0");
     this->declare_parameter<int>("baud", 115200);
+    this->declare_parameter<int>("sensor_num", 33);
+    this->declare_parameter<int>("payload_size", 66);
     port_ = this->get_parameter("port").as_string();
     baud_ = this->get_parameter("baud").as_int();
+    sensor_ = this->get_parameter("sensor_num").as_int();
+    payload_size_ = this->get_parameter("payload_size").as_int();
 
     pub_raw_       = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values_raw", 10);
     pub_reordered_ = this->create_publisher<tatto_ros2_msgs::msg::SensorArray>("/tatto/sensor_values", 10);
 
-    bset_.assign(number_of_sensor, 0);
-    bset_prev_.assign(number_of_sensor, 0);
-    minv_.assign(number_of_sensor, 0);
+    bset_.assign(sensor_, 0);
+    bset_prev_.assign(sensor_, 0);
+    minv_.assign(sensor_, 0);
 
     if (!init_serial()) {
       RCLCPP_ERROR(get_logger(), "Serial init failed. Node will run but publish nothing.");
@@ -117,10 +120,10 @@ private:
     if (head_idx < 0) return;
 
     // シフト
-    for (int i = 0; i < number_of_sensor; ++i) bset_prev_[i] = bset_[i];
+    for (int i = 0; i < sensor_; ++i) bset_prev_[i] = bset_[i];
 
     // デコード（Big-endian）
-    for (int i = 0; i < number_of_sensor; ++i) {
+    for (int i = 0; i < sensor_; ++i) {
       uint16_t hi = buf[head_idx + 2*i];
       uint16_t lo = buf[head_idx + 2*i + 1];
       bset_[i] = static_cast<uint16_t>((hi << 8) | lo);
@@ -145,7 +148,7 @@ private:
     // 初回キャリブレーション
     if (!calibrated_) {
       bool all_set = true;
-      for (int i = 0; i < number_of_sensor; ++i) {
+      for (int i = 0; i < sensor_; ++i) {
         if (minv_[i] == 0) {
           if (bset_[i] != 0 && (int)bset_[i] - (int)bset_prev_[i] >= 0) {
             minv_[i] = bset_[i];
@@ -220,10 +223,11 @@ private:
   // Params
   std::string port_;
   int baud_;
+  int sensor_;
 
   // Serial
   int serial_port_;
-  const int payload_size_;
+  int payload_size_;
 
   // State
   std::vector<uint16_t> bset_, bset_prev_;
