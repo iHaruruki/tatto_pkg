@@ -44,20 +44,20 @@ source install/setup.bash
 ### Launch Tatto / Tattoを起動する
 Check USB conection
 ```bash
-ls /dev/ttyUSB*
+ls /dev/ttyACM*
 ```
 Output results / 出力結果
 ```bash
-/dev/ttyUSB0
+/dev/ttyACM
 ```
 Changes the permissions on the device file.
 ```bash
-sudo chmod 666 /dev/ttyUSB0
+sudo chmod 666 /dev/ttyACM
 ```
 
 Run `sensor_reader_node` / シリアル通信を開始
 ```bash
-ros2 run tatto_ros2 tatto_serial_node --ros-args -p port:=/dev/ttyUSB0
+ros2 run tatto_ros2 tatto_serial_node --ros-args -p port:=/dev/ttyACM
 ```
 Run `sensor_display_node` / ディスプレイに表示
 ```bash
@@ -67,14 +67,14 @@ To see the data being published on a topic / センサの値を見る
 ```bash
 ros2 topic echo /tatto/sensor_values
 ```
-Export topics in CSV format. / トピックをCSV形式で出力
+<!-- Export topics in CSV format. / トピックをCSV形式で出力
 ```bash
 ros2 topic echo /tatto/sensor_values --csv > output.csv
 ```
 csv format
 ```csv
 stamp_sec, stamp_nanosec, frame_id, 0, data0, data1, data2, data3, data4, data5, data6, data7, data8
-```
+``` -->
 
 Sensor placement / センサの配置位置  
 <img src="media/IMG_3870.jpg" alt="sensor placement" style="width:30%;height:auto;">
